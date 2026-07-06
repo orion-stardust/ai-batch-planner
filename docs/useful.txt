@@ -1,0 +1,7 @@
+To checkout Github Repository : 
+git clone --recursive https://github.com/orion-stardust/ai-batch-planner.git
+
+To Checkin .gitignore :
+git add .gitignore or git add .
+git commit -m "Add Python .gitignore"
+git push

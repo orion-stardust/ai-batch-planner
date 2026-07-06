@@ -1,0 +1,41 @@
+• CRM is being developed in the Intellect. End of August will be read. 
+• MERN Stack (Mongo DB+ Express.js + React.js + Node.js)
+
+• Trainer Usecase :
+	• Student Attendence
+	• Assement
+	• Review
+
+• General Course Duration :
+	• Weekdays : 9.30am - 11.30am, 11.45am to 1.45pm, 2.45pm to 4.45pm, 5pm to 7pm
+	• Weekend : 10am to 4PM
+
+• How the batch allocation happens after registration completion:
+	• Start date of the Batch
+	• Duration (3 Months is plan for an example )
+	• End date filled by itself
+	• Student Project Submission - 5 days / 1 week (If it is not Saturday, Next Saturday to be taken)
+	• Public Holiday, Religious Holidays, Meeting, Event, Trainer Resignation, 
+	• Absence - Substitute taken topic to be selected
+	• Trainer can switch the content with free hand but to be selected everyday
+	• Pipeline Course to be suggested as per the Critical Resource
+	• Agile Management - Critical Resource Calculation
+
+• Student Attendence Leave > 3 days -> Automatic Email
+• Placement training - Skipped by Student, will be informed no placement support to be given
+
+
+=======================================
+To be deleted later :
+
+Create a Excel File
+-Fill from 01.01.2026 to 30.07.2026
+-Batch allocation
+-Trainer Arun, Nataraj, Gopi, Maha
+-Courses PFS (2 Months), MEAN (1.5 Months), DevOps(2.5 Months), AIML(3 Months) 
+-Give randomly 3-5 working days gap before new batch starts
+-Give randomly 1-2 days leave per month per trainer
+-Mark Saturday & Sunday and do not count.
+-Trainer Name in the Rows
+-Calender days in the column which should be 365 for year 2026
+=======================================

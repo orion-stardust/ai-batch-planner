@@ -1,0 +1,13 @@
+Database :
+
+- Create a table called "trainer" inside /database/batch_planner.db
+- Create Field Id autogenrated, Trainer Name in Text, Trainer Skill in Text,   
+
+Models :
+
+
+
+Routes :
+
+Services :
+

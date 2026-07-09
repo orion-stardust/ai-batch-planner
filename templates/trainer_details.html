@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}
+Trainer Details
+{% endblock %}
+
+{% block content %}
+
+<h2>Trainer Details</h2>
+
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('trainer.view_trainers') }}">Back to List</a>
+    |
+    <a href="{{ url_for('trainer.edit_trainer_page', trainer_id=trainer['trainer_id']) }}">Edit Details</a>
+</div>
+
+<table border="1" cellpadding="10" style="border-collapse: collapse; width: 50%;">
+    <tr>
+        <th>ID</th>
+        <td>{{ trainer["trainer_id"] }}</td>
+    </tr>
+    <tr>
+        <th>Full Name</th>
+        <td>{{ trainer["full_name"] }}</td>
+    </tr>
+    <tr>
+        <th>Email</th>
+        <td>{{ trainer["email"] }}</td>
+    </tr>
+    <tr>
+        <th>Phone</th>
+        <td>{{ trainer["phone"] }}</td>
+    </tr>
+    <tr>
+        <th>Skills</th>
+        <td>{{ trainer["skills"] }}</td>
+    </tr>
+    <tr>
+        <th>Experience (Years)</th>
+        <td>{{ trainer["experience"] }}</td>
+    </tr>
+    <tr>
+        <th>Employment Status</th>
+        <td>{{ trainer["status"] }}</td>
+    </tr>
+    <tr>
+        <th>Availability Status</th>
+        <td>{{ trainer["availability"] }}</td>
+    </tr>
+    <tr>
+        <th>Created At</th>
+        <td>{{ trainer["created_at"] }}</td>
+    </tr>
+    <tr>
+        <th>Updated At</th>
+        <td>{{ trainer["updated_at"] }}</td>
+    </tr>
+</table>
+
+{% endblock %}

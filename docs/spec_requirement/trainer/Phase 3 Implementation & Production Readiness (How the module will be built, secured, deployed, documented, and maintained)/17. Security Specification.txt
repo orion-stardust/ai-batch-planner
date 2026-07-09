@@ -1,0 +1,35 @@
+Purpose of the module: Defines security requirements.
+
+Authentication:
+Current:
+Administrator access only (planned).
+
+Future
+Login authentication.
+Role-based access.
+
+
+Input Validation:
+Validate:
+Required fields
+Email format
+Phone format
+Experience value
+
+
+Database Security:
+Prevent SQL Injection.
+Validate all user input.
+Restrict invalid operations.
+
+
+UI Security:
+Prevent invalid form submissions.
+Display user-friendly error messages.
+
+
+Future Security:
+CSRF protection
+Session management
+Password hashing
+Audit logging

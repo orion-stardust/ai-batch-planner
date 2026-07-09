@@ -1,0 +1,45 @@
+Purpose of the module: Defines implementation guidelines for Trainer Management.
+
+Implementation Components:
+Backend:
+Trainer Routes
+Trainer Services
+Trainer Models
+
+
+Frontend:
+Trainer List Page
+Add Trainer Page
+Edit Trainer Page
+Trainer Details Page
+
+
+Database:
+Trainer Table
+Database Connection
+CRUD Operations
+
+
+AI (Future):
+Trainer Recommendation
+Availability Prediction
+
+
+Coding Standards:
+Follow project folder structure.
+Separate Routes, Services, and Models.
+Keep business logic in Services.
+Keep database operations in Models.
+Keep templates presentation-only.
+Use meaningful variable and function names.
+Handle exceptions properly.
+Write reusable code.
+
+
+Expected Deliverables:
+Working CRUD functionality
+Search functionality
+Filter functionality
+Availability tracking
+Input validation
+Error handling

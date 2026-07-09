@@ -1,0 +1,58 @@
+Purpose of the module: Defines development testing requirements.
+
+Unit Testing:-
+Modules :
+Routes
+Services
+Models
+
+
+Integration Testing:
+Verify:
+Route → Service
+Service → Model
+Model → Database
+
+
+UI Testing:
+Verify:
+Forms
+Search
+Filter
+CRUD Operations
+Validation Messages
+
+
+Database Testing:
+Verify:
+Insert
+Update
+Delete
+Search
+Constraints
+
+
+Acceptance Testing:
+AT-01
+Create trainer.
+Expected Result → Trainer stored successfully.
+
+AT-02
+Edit trainer.
+Expected Result → Trainer updated successfully.
+
+AT-03
+Delete trainer.
+Expected Result → Trainer removed successfully.
+
+AT-004
+Search trainer.
+Expected Result → Correct trainers displayed.
+
+AT-05
+Filter trainer.
+Expected Result → Filtered trainers displayed.
+
+AT-06
+Validation.
+Expected Result → Invalid data is rejected.

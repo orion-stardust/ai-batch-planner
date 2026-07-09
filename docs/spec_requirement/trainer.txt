@@ -1,13 +1,7 @@
-Database :
+Purpose
 
-- Create a table called "trainer" inside /database/batch_planner.db
-- Create Field Id autogenrated, Trainer Name in Text, Trainer Skill in Text,   
+The Trainer Management module is responsible for maintaining trainer information within the AI Batch Planner system.
 
-Models :
+It acts as the single source of truth for all trainer-related data and will be used by future modules such as Batch Planning, Scheduling, Attendance, Reports, and AI Trainer Recommendation.
 
-
-
-Routes :
-
-Services :
 

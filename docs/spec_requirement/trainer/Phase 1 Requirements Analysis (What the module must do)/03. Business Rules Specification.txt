@@ -1,0 +1,21 @@
+Purpose
+Defines trainer management business rules.
+The Business rules should be followed accurately 
+
+
+Business Rules
+BR-01 → Trainer name is mandatory.
+
+BR-02 → Email must be unique.
+
+BR-03 → Phone number must be valid and unique.
+
+BR-04 → Experience cannot be negative.
+
+BR-05 → Trainer status must be Active or Inactive.
+
+BR-06 → Unavailable trainers cannot be assigned.
+
+BR-07 → Deleted trainers cannot be restored without re-registration.
+
+BR-008 → Administrator performs all trainer operations.

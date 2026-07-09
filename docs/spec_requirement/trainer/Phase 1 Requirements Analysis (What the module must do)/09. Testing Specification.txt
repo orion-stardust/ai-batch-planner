@@ -1,0 +1,36 @@
+Purpose of the module
+
+Defines functional testing requirements and test cases before training 
+
+Test Cases:
+TC-01
+Create trainer with valid data.
+Expected → Trainer created.
+
+TC-02
+Create trainer with empty name.
+Expected → Validation error.
+
+TC-03
+Duplicate email.
+Expected → Validation error.
+
+TC-04
+Edit trainer.
+Expected → Trainer updated.
+
+TC-05
+Delete trainer.
+Expected → Trainer removed.
+
+TC-06
+Search trainer.
+Expected → Correct records returned.
+
+TC-07
+Filter trainer.
+Expected → Filtered records displayed.
+
+TC-08
+Availability tracking.
+Expected → Correct availability displayed.

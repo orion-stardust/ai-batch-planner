@@ -1,0 +1,43 @@
+Purpose of the module: Design the database structure for Trainer Management.
+
+Tables:
+Trainer
+Purpose:
+Stores trainer information.
+
+Columns:
+Trainer ID
+Full Name
+Email
+Phone Number
+Skills
+Experience
+Availability Status
+Employment Status
+Created Date
+Updated Date
+
+
+Primary Key:
+Trainer ID
+
+
+Constraints:
+Trainer ID is unique.
+Email is unique.
+Required fields cannot be null.
+
+
+Relationships:
+Trainer
+   │
+   ├── Batch (Future)
+   ├── Attendance (Future)
+   ├── Leave (Future)
+   └── Reviews (Future)
+
+
+Future Database Expansion:
+Trainer Leave Table
+Trainer Availability Table
+Trainer Skill Mapping Table

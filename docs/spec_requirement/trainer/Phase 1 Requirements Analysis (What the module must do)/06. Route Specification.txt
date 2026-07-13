@@ -1,0 +1,49 @@
+Purpose of the module: Defines application routes.
+
+Route - Create Trainer
+Method
+POST
+Input
+Trainer Details
+Output
+Trainer Created
+
+Route - View Trainers
+Method
+GET
+Input
+None
+Output
+Trainer List
+
+Route - Edit Trainer
+Method
+PUT
+Input
+Trainer Details
+Output
+Trainer Updated
+
+Route - Delete Trainer
+Method
+DELETE
+Input
+Trainer ID
+Output
+Trainer Deleted
+
+Route - Search Trainer
+Method
+GET
+Input
+Keyword
+Output
+Matching Trainers
+
+Route - Filter Trainer
+Method
+GET
+Input
+Filter Values
+Output
+Filtered Trainers

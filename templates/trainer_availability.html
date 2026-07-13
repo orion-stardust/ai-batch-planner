@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}
+Trainer Availability
+{% endblock %}
+
+{% block content %}
+
+<h2>Update Trainer Availability</h2>
+
+<form
+    action="{{ url_for('trainer.update_availability', trainer_id=trainer['trainer_id']) }}"
+    method="POST"
+>
+
+    <p>
+        <strong>Name:</strong>
+        {{ trainer["full_name"] }}
+    </p>
+
+    <p>
+        <strong>Status:</strong>
+        {{ trainer["status"] }}
+    </p>
+
+    <label for="availability">
+        Availability
+    </label>
+
+    <select
+        id="availability"
+        name="availability"
+    >
+
+        <option
+            value="Available"
+            {% if trainer["availability"] == "Available" %}selected{% endif %}
+        >
+            Available
+        </option>
+
+        <option
+            value="Unavailable"
+            {% if trainer["availability"] == "Unavailable" %}selected{% endif %}
+        >
+            Unavailable
+        </option>
+
+    </select>
+
+    <br><br>
+
+    <button type="submit">
+        Update Availability
+    </button>
+
+    <a href="{{ url_for('trainer.view_trainers') }}">
+        Cancel
+    </a>
+
+</form>
+
+{% endblock %}

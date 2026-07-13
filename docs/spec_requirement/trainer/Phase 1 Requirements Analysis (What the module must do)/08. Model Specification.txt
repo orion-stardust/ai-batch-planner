@@ -1,0 +1,22 @@
+Purpose of the module: Defines trainer data model responsibilities.
+
+Responsibilities:
+Store Trainer
+Retrieve Trainer
+Update Trainer
+Delete Trainer
+Search Trainer
+Filter Trainer
+Retrieve Availability
+
+Managed Data: 
+Trainer
+Availability
+Skills
+Leave
+
+
+Future:
+Batch Mapping
+Attendance Mapping
+Reports

@@ -1,0 +1,22 @@
+Purpose
+Defines administrator interaction with Trainer Management.
+
+Actors:
+Administrator
+
+User Flows
+Add Trainer:
+Administrator → Open Trainer Page → Click Add Trainer → Enter Details → Submit → Validation → Trainer Saved
+
+Edit Trainer:
+Administrator → Select Trainer → Modify Details → Save → Trainer Updated 
+
+Delete Trainer:
+Administrator → Select Trainer → Confirm Delete → Trainer Removed 
+
+Search Trainer:
+
+Administrator → Enter Keyword → Search → Results Displayed
+
+Filter Trainer:
+Administrator → Select Filter → Apply → Filtered Results

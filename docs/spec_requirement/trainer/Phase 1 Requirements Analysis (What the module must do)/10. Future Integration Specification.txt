@@ -1,0 +1,37 @@
+Purpose of the module: Defines future module integrations.
+
+Batch Module:
+Assign trainer
+Check availability
+Workload tracking
+
+
+Course Module:
+Skill mapping
+Technology matching
+
+
+Attendance Module:
+Trainer attendance
+
+
+Report Module:
+Trainer utilization
+Trainer performance
+
+
+AI Module:
+Trainer recommendation
+Availability prediction
+Workload optimization
+
+
+Authentication Module:
+Role-based access
+Permissions
+
+
+Notification Module:    
+Trainer assignment notification
+Leave notification
+Schedule updates

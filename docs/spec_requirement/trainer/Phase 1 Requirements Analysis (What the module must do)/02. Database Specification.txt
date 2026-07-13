@@ -1,0 +1,43 @@
+Purpose: POST the trainer details and GET or retrieving the details with other modules. Defines trainer-related data requirements.
+
+Sections
+Table Name
+Trainer
+
+Entities:
+Trainer
+Trainer Availability
+Trainer Skills
+Trainer Leave
+
+Fields - 
+Trainer ID
+Full Name
+Email
+Phone Number
+Skills
+Experience (Years)
+Status (Active / Inactive)
+Availability
+Created Date
+Updated Date
+
+columns For each field - Name Data Type Required Default Description
+
+Example: Trainer Name Type VARCHAR Required Yes Description
+
+Constraints or the rules of the module are:
+Trainer ID is unique.
+Email unique 
+Phone unique
+Experience >=0
+Required fields cannot be empty.
+
+
+Relationships:
+Trainer → Availability → Leave
+
+In future we will connect relationship with
+Batch Assignment
+Attendance
+AI Recommendation

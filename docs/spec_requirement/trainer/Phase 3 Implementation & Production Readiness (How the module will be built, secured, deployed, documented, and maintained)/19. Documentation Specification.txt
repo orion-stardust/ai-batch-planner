@@ -1,0 +1,36 @@
+Purpose of the module: Defines required project documentation.
+
+Developer Documentation:
+
+Include:
+Module overview
+Folder structure
+Route descriptions
+Service descriptions
+Model descriptions
+
+
+User Documentation:
+
+Include:
+Add trainer
+Edit trainer
+Delete trainer
+Search trainer
+Filter trainer
+
+
+Technical Documentation:
+
+Include:
+Database structure
+Data flow
+Module dependencies
+
+
+AI Documentation (Future):
+
+Include:
+AI workflow
+Recommendation process
+Prompt overview

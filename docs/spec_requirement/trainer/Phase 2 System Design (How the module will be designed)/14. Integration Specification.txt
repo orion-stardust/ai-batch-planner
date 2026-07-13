@@ -1,0 +1,30 @@
+Purpose of the module: Defines interactions with other project modules.
+
+Database Integration
+
+Trainer Service → Trainer Model → SQLite Database 
+
+
+UI Integration
+
+Browser → Routes → Services → Models → Database
+
+Future Module Integration:
+
+Batch Module:
+Assign trainer
+Verify availability
+
+Course Module:
+Match trainer skills
+
+Report Module:
+Trainer utilization
+Workload reports
+
+AI Module:
+Recommend trainer
+Predict availability
+
+Authentication Module:
+Restrict trainer management to administrators

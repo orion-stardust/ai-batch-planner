@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Trainer
+{% endblock %}
+
+{% block content %}
+
+<h2>Add Trainer</h2>
+
+<form action="{{ url_for('trainer.save_trainer') }}" method="POST">
+
+    <label for="full_name">Full Name</label>
+    <input
+        type="text"
+        id="full_name"
+        name="full_name"
+        required
+    >
+
+    <label for="email">Email</label>
+    <input
+        type="email"
+        id="email"
+        name="email"
+        required
+    >
+
+    <label for="phone">Phone</label>
+    <input
+        type="text"
+        id="phone"
+        name="phone"
+        required
+    >
+
+    <label for="skills">Skills</label>
+    <input
+        type="text"
+        id="skills"
+        name="skills"
+        placeholder="e.g. Python, Flask, SQL"
+        required
+    >
+
+    <label for="experience">Experience (Years)</label>
+    <input
+        type="number"
+        id="experience"
+        name="experience"
+        min="0"
+        value="0"
+        required
+    >
+
+    <label for="status">Status</label>
+    <select id="status" name="status" required>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+    </select>
+
+    <label for="availability">Availability</label>
+    <select
+        id="availability"
+        name="availability"
+        required
+    >
+        <option value="Available">
+            Available
+        </option>
+        <option value="Unavailable">
+            Unavailable
+        </option>
+    </select>
+
+    <button type="submit">
+        Save Trainer
+    </button>
+
+</form>
+
+{% endblock %}

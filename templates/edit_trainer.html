@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Trainer
+{% endblock %}
+
+{% block content %}
+
+<h2>Edit Trainer</h2>
+
+<form
+    action="{{ url_for('trainer.edit_trainer', trainer_id=trainer['trainer_id']) }}"
+    method="POST"
+>
+
+    <label for="full_name">Full Name</label>
+    <input
+        type="text"
+        id="full_name"
+        name="full_name"
+        value="{{ trainer['full_name'] }}"
+        required
+    >
+
+    <label for="email">Email</label>
+    <input
+        type="email"
+        id="email"
+        name="email"
+        value="{{ trainer['email'] }}"
+        required
+    >
+
+    <label for="phone">Phone</label>
+    <input
+        type="text"
+        id="phone"
+        name="phone"
+        value="{{ trainer['phone'] }}"
+        required
+    >
+
+    <label for="skills">Skills</label>
+    <input
+        type="text"
+        id="skills"
+        name="skills"
+        value="{{ trainer['skills'] }}"
+        required
+    >
+
+    <label for="experience">Experience (Years)</label>
+    <input
+        type="number"
+        id="experience"
+        name="experience"
+        min="0"
+        value="{{ trainer['experience'] }}"
+        required
+    >
+
+    <label for="status">Status</label>
+    <select id="status" name="status" required>
+        <option value="Active" {% if trainer['status'] == 'Active' %}selected{% endif %}>Active</option>
+        <option value="Inactive" {% if trainer['status'] == 'Inactive' %}selected{% endif %}>Inactive</option>
+    </select>
+
+    <label for="availability">Availability</label>
+    <select
+        id="availability"
+        name="availability"
+        required
+    >
+        <option
+            value="Available"
+            {% if trainer['availability'] == 'Available' %}selected{% endif %}
+        >
+            Available
+        </option>
+        <option
+            value="Unavailable"
+            {% if trainer['availability'] == 'Unavailable' %}selected{% endif %}
+        >
+            Unavailable
+        </option>
+    </select>
+
+    <button type="submit">
+        Update Trainer
+    </button>
+
+</form>
+
+{% endblock %}

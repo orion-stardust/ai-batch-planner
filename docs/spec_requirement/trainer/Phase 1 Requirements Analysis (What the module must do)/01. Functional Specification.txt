@@ -1,0 +1,105 @@
+Purpose of the module:  maintenance of the trainer in a Training center
+
+Register trainers
+Update trainers
+Delete trainers
+Search trainers
+Filter trainers
+Track trainer availability
+
+Scope of this module:
+CRUD
+Search
+Filter
+View Trainer Details
+Track Availability
+
+Actors of the module is 
+Primary:Administrator
+
+Future:
+AI Scheduler
+Report Module
+Authentication Module
+
+
+Functional Requirements are
+Create Trainer
+Description
+Admin can register trainer.
+Input
+Trainer information
+Output
+Trainer saved successfully.
+---------------------------------------
+View Trainer
+Description
+Administrator can view all trainers.
+Input
+None.
+Output
+Trainer list displayed.
+-------------------------------------
+Update Trainer
+Description
+Administrator can modify trainer details.
+Input
+Updated trainer information.
+Output
+Trainer updated successfully.
+-------------------------------------------
+Delete Trainer
+Description
+Administrator can remove a trainer.
+Input
+Trainer ID.
+Output
+Trainer deleted successfully.
+-------------------------------------------
+Search Trainer
+Description
+Administrator can search trainers.
+Input
+Search keyword.
+Output
+Matching trainers displayed.
+-------------------------------------------
+Filter Trainer
+Description
+Administrator can filter trainers.
+Input
+Filter criteria.
+Output
+Filtered trainer list.
+------------------------------------------
+Track Availability
+Description
+Administrator can view trainer availability.
+Input
+Trainer ID.
+Output
+Availability information displayed.
+----------------------------------------------
+
+
+
+Non Functional Requirements are
+Fast response
+Secure
+Easy maintenance
+Modular
+Scalable
+
+Dependencies:
+Depends on Database,Flask,Templates, Static Resources
+
+
+Acceptance Criteria:
+
+Administrator can create trainer.
+Administrator can edit trainer.
+Administrator can delete trainer.
+Search returns correct results.
+Filter works correctly.
+Validation works.
+Trainer appears in list.

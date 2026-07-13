@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+        background: var(--surface-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .stat-title {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-top: 0.5rem;
+        color: var(--text-main);
+    }
+
+    /* Toolbar & Search */
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .search-form {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .input-control {
+        background: var(--surface-color);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .input-control:focus {
+        border-color: var(--primary);
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+        font-family: inherit;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+        background: var(--surface-hover);
+    }
+
+    .btn-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+        padding: 0.4rem 0.8rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-danger:hover {
+        background: var(--danger);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: var(--surface-hover);
+        color: var(--text-main);
+        padding: 0.4rem 0.8rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-secondary:hover {
+        background: #475569;
+    }
+
+    /* Table */
+    .table-container {
+        background: var(--surface-color);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .data-table th, .data-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .data-table th {
+        background: rgba(15, 23, 42, 0.4);
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+
+    .data-table tr.inactive-row {
+        opacity: 0.6;
+    }
+
+    .data-table tr:hover {
+        background: var(--surface-hover);
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .status-inactive {
+        background: rgba(148, 163, 184, 0.1);
+        color: var(--text-muted);
+    }
+
+    .actions-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+</style>
+
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-title">Total Courses</div>
+        <div class="stat-value">{{ stats.total_courses }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">Active Courses</div>
+        <div class="stat-value">{{ stats.active_courses }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">Inactive Courses</div>
+        <div class="stat-value">{{ stats.inactive_courses }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">Avg. Duration</div>
+        <div class="stat-value">{{ "%.1f"|format(stats.average_duration or 0) }}h</div>
+    </div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+    <form class="search-form" action="{{ url_for('course_bp.list_courses') }}" method="GET">
+        <input type="text" name="keyword" class="input-control" placeholder="Search courses..." value="{{ request.args.get('keyword', '') }}">
+        <select name="status" class="input-control">
+            <option value="">All Statuses</option>
+            <option value="Active" {% if request.args.get('status') == 'Active' %}selected{% endif %}>Active</option>
+            <option value="Inactive" {% if request.args.get('status') == 'Inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+        <button type="submit" class="btn btn-outline">Filter</button>
+        {% if request.args.get('keyword') or request.args.get('status') %}
+            <a href="{{ url_for('course_bp.list_courses') }}" class="btn btn-outline">Clear</a>
+        {% endif %}
+    </form>
+    
+    <a href="{{ url_for('course_bp.create_course') }}" class="btn btn-primary">+ Add New Course</a>
+</div>
+
+<!-- Table -->
+<div class="table-container">
+    <table class="data-table" id="coursesTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Technology</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr class="course-row" data-status="{{ course.status }}">
+                <td style="font-weight: 500;">{{ course.course_name }}</td>
+                <td>{{ course.technology_stack }}</td>
+                <td>{{ course.duration_hours }} hrs</td>
+                <td>
+                    <span class="status-badge {% if course.status == 'Active' %}status-active{% else %}status-inactive{% endif %}">
+                        {{ course.status }}
+                    </span>
+                </td>
+                <td>
+                    <div class="actions-group">
+                        <a href="{{ url_for('course_bp.edit_course', course_id=course.id) }}" class="btn btn-secondary">Edit</a>
+                        
+                        <form action="{{ url_for('course_bp.update_status', course_id=course.id) }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="status" value="{% if course.status == 'Active' %}Inactive{% else %}Active{% endif %}">
+                            <button type="submit" class="btn btn-secondary">Toggle Status</button>
+                        </form>
+
+                        <form action="{{ url_for('course_bp.delete_course', course_id=course.id) }}" method="POST" class="delete-form" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                    No courses found. Try adjusting your search filters.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

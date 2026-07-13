@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: var(--surface-color);
+        padding: 2.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1rem;
+    }
+
+    .form-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--text-main);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
+
+    .form-control {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        text-decoration: none;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+        background: var(--surface-hover);
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-header">
+        <h2>{% if course %}Edit Course{% else %}Create New Course{% endif %}</h2>
+    </div>
+
+    <form id="courseForm" method="POST" action="{% if course %}{{ url_for('course_bp.edit_course', course_id=course.id) }}{% else %}{{ url_for('course_bp.create_course') }}{% endif %}">
+        
+        <div class="form-group">
+            <label class="form-label" for="course_name">Course Name</label>
+            <input type="text" id="course_name" name="course_name" class="form-control" 
+                   value="{{ course.course_name if course else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="technology_stack">Technology Stack</label>
+            <input type="text" id="technology_stack" name="technology_stack" class="form-control" 
+                   value="{{ course.technology_stack if course else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="duration_hours">Duration (Hours)</label>
+            <input type="number" id="duration_hours" name="duration_hours" class="form-control" 
+                   value="{{ course.duration_hours if course else '' }}" min="1" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="status">Status</label>
+            <select id="status" name="status" class="form-control">
+                <option value="Active" {% if course and course.status == 'Active' %}selected{% endif %}>Active</option>
+                <option value="Inactive" {% if course and course.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="description">Description (Optional)</label>
+            <textarea id="description" name="description" class="form-control">{{ course.description if course else '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('course_bp.list_courses') }}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Course</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

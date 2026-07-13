@@ -1,7 +1,16 @@
 import sqlite3
-<<<<<<< HEAD
+import os
 
-DATABASE_NAME = "database/batch_planner.db"
+# Get the current directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Database file path
+DB_PATH = os.path.join(BASE_DIR, "batch_planner.db")
+
+# Schema file path
+SCHEMA_PATH = os.path.join(BASE_DIR, "schema.sql")
+
+DATABASE_NAME = DB_PATH
 
 
 def get_connection():
@@ -14,18 +23,6 @@ def get_connection():
     connection.execute("PRAGMA foreign_keys = ON")
 
     return connection
-
-=======
-import os
-
-# Get the current directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Database file path
-DB_PATH = os.path.join(BASE_DIR, "batch_planner.db")
-
-# Schema file path
-SCHEMA_PATH = os.path.join(BASE_DIR, "schema.sql")
 
 
 def initialize_database():
@@ -45,4 +42,3 @@ def initialize_database():
 
 if __name__ == "__main__":
     initialize_database()
->>>>>>> e8568112bbd6275753fba240fe45b17c67c21592

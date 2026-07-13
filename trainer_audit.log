@@ -22,3 +22,15 @@
 2026-07-09 14:43:06,671 - INFO - Successfully deleted trainer ID 1
 2026-07-09 14:43:06,700 - INFO - Successfully created trainer: name='Alice Smith', email='alice@example.com'
 2026-07-09 14:43:06,713 - INFO - Successfully updated trainer ID 1: name='Alice Updated'
+2026-07-13 15:06:00,358 - INFO - Successfully created trainer: name='Bob Tester', email='bob@tester.com'
+2026-07-13 15:06:00,435 - INFO - Successfully created trainer: name='Bob Tester', email='bob@tester.com'
+2026-07-13 15:06:00,548 - INFO - Successfully created trainer: name='Alice Smith', email='alice@example.com'
+2026-07-13 15:06:00,553 - ERROR - Failed to create trainer: name='Bob Jones', email='alice@example.com'. DB Error: UNIQUE constraint failed: trainer.email
+2026-07-13 15:06:00,593 - WARNING - Failed to create trainer. Validation error: Trainer name is required.
+2026-07-13 15:06:00,634 - WARNING - Failed to create trainer. Validation error: Phone number must be a valid number with 7 to 15 digits.
+2026-07-13 15:06:00,677 - WARNING - Failed to create trainer. Validation error: Experience cannot be negative.
+2026-07-13 15:06:00,691 - INFO - Successfully created trainer: name='Alice Smith', email='alice@example.com'
+2026-07-13 15:06:00,754 - INFO - Successfully created trainer: name='Alice Smith', email='alice@example.com'
+2026-07-13 15:06:00,774 - INFO - Successfully deleted trainer ID 1
+2026-07-13 15:06:00,830 - INFO - Successfully created trainer: name='Alice Smith', email='alice@example.com'
+2026-07-13 15:06:00,845 - INFO - Successfully updated trainer ID 1: name='Alice Updated'

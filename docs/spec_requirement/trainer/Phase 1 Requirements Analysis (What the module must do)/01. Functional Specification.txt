@@ -1,21 +1,24 @@
-Purpose of the module:  maintenance of the trainer in a Training center
+Purpose of the module: Maintenance of trainers and their date-specific availability in a Training Center.
 
 Register trainers
 Update trainers
 Delete trainers
 Search trainers
 Filter trainers
-Track trainer availability
+Track date-specific trainer availability and slot assignments
+Manage global calendar events (public holidays, company meetings)
+Auto-import public holidays for calendar years
 
 Scope of this module:
-CRUD
-Search
-Filter
-View Trainer Details
-Track Availability
+CRUD Operations on Trainers (including Qualifications and Audit Fields)
+Search and Filter on Trainers (by keyword and status)
+View Trainer Details (showing Qualifications, Skills, Audit Logs)
+Track Date-Specific Availability via Child Overrides
+Create and Manage Global Calendar Events
+Import National Holidays for India Region
 
-Actors of the module is 
-Primary:Administrator
+Actors of the module:
+Primary: Administrator
 
 Future:
 AI Scheduler
@@ -23,67 +26,49 @@ Report Module
 Authentication Module
 
 
-Functional Requirements are
+Functional Requirements:
 Create Trainer
-Description
-Admin can register trainer.
-Input
-Trainer information
-Output
-Trainer saved successfully.
+Description: Admin can register trainer with audit fields (Created By) and Qualifications.
+Input: Trainer information (Name, Email, Phone, Skills, Experience, Status, Qualifications, Created By)
+Output: Trainer saved successfully.
 ---------------------------------------
-View Trainer
-Description
-Administrator can view all trainers.
-Input
-None.
-Output
-Trainer list displayed.
+View Trainer List
+Description: Administrator can view all trainers, searching by keyword and filtering by status.
+Input: Search keyword, Status filter.
+Output: Trainer list displayed with Qualifications and Status.
 -------------------------------------
 Update Trainer
-Description
-Administrator can modify trainer details.
-Input
-Updated trainer information.
-Output
-Trainer updated successfully.
+Description: Administrator can modify trainer details and records audit fields (Updated By).
+Input: Updated trainer information, Updated By.
+Output: Trainer updated successfully.
 -------------------------------------------
 Delete Trainer
-Description
-Administrator can remove a trainer.
-Input
-Trainer ID.
-Output
-Trainer deleted successfully.
+Description: Administrator can remove a trainer.
+Input: Trainer ID.
+Output: Trainer deleted successfully.
 -------------------------------------------
-Search Trainer
-Description
-Administrator can search trainers.
-Input
-Search keyword.
-Output
-Matching trainers displayed.
+Search & Filter Trainers
+Description: Search by name/skills/qualifications and filter by employment status.
+Input: Search term, status.
+Output: Matching trainers.
 -------------------------------------------
-Filter Trainer
-Description
-Administrator can filter trainers.
-Input
-Filter criteria.
-Output
-Filtered trainer list.
-------------------------------------------
-Track Availability
-Description
-Administrator can view trainer availability.
-Input
-Trainer ID.
-Output
-Availability information displayed.
+Manage Availability & Overrides
+Description: Record date-specific availability override for a trainer (1 = Available, 0 = Unavailable).
+Input: Trainer ID, Date, Availability Type (Available, Unavailable), Duration Type (Full Day, Half Day, Specific Slot), Time Slot, Start Time, End Time, Description.
+Output: Availability override saved successfully.
 ----------------------------------------------
+Manage Global Calendar Events
+Description: Record public holidays or company meetings that globally mark all trainers unavailable.
+Input: Date, Event Type (Public Holiday, Company Meeting), Description.
+Output: Calendar event registered.
+----------------------------------------------
+Import Holidays
+Description: Automatically fetch and populate public holidays for a given calendar year.
+Input: Calendar year.
+Output: Holidays populated successfully.
 
 
-
-Non Functional Requirements are
+Non Functional Requirements:
 Fast response
 Secure
 Easy maintenance
@@ -91,15 +76,14 @@ Modular
 Scalable
 
 Dependencies:
-Depends on Database,Flask,Templates, Static Resources
+Depends on Database, Flask, Python holidays package, Templates, Static Resources
 
 
 Acceptance Criteria:
-
-Administrator can create trainer.
-Administrator can edit trainer.
+Administrator can create trainer with qualifications and auditing metadata.
+Administrator can edit trainer details and qualifications.
 Administrator can delete trainer.
-Search returns correct results.
-Filter works correctly.
-Validation works.
-Trainer appears in list.
+Search and filters return correct results.
+Dynamic availability resolves correctly based on weekend status, calendar holidays, and availability overrides.
+Holidays can be imported automatically for any given calendar year.
+Trainer availability overrides can be added and deleted successfully.

@@ -1,60 +1,268 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}
-Trainer Details
-{% endblock %}
+{% block title %}Trainer Details - {{ trainer['full_name'] }}{% endblock %}
 
 {% block content %}
+<style>
+    .profile-card {
+        max-width: 800px;
+        margin: 0 auto;
+        background: var(--surface-color);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
 
-<h2>Trainer Details</h2>
+    .profile-header {
+        background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), rgba(167, 139, 250, 0.1));
+        border-bottom: 1px solid var(--border);
+        padding: 2.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
 
-<div style="margin-bottom: 20px;">
-    <a href="{{ url_for('trainer.view_trainers') }}">Back to List</a>
-    |
-    <a href="{{ url_for('trainer.edit_trainer_page', trainer_id=trainer['trainer_id']) }}">Edit Details</a>
+    .profile-title-area h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .profile-subtitle {
+        color: var(--text-muted);
+        font-size: 1rem;
+    }
+
+    .profile-badges {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .status-badge {
+        padding: 0.35rem 1rem;
+        border-radius: 9999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+
+    .status-inactive {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .status-available {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary);
+    }
+
+    .status-unavailable {
+        background: rgba(148, 163, 184, 0.1);
+        color: var(--text-muted);
+    }
+
+    .profile-body {
+        padding: 2.5rem;
+    }
+
+    .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-group {
+        border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+        padding-bottom: 1rem;
+    }
+
+    .info-group:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 1.125rem;
+        color: var(--text-main);
+        font-weight: 500;
+    }
+
+    .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .skill-tag {
+        background: rgba(51, 65, 85, 0.5);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .profile-footer {
+        background: rgba(15, 23, 42, 0.3);
+        border-top: 1px solid var(--border);
+        padding: 1.5rem 2.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .timestamps {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    .actions-row {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+        font-family: inherit;
+        font-size: 0.95rem;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+        background: var(--surface-hover);
+    }
+
+    .btn-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+
+    .btn-danger:hover {
+        background: var(--danger);
+        color: white;
+    }
+</style>
+
+<div style="margin-bottom: 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+    <a href="{{ url_for('trainer.view_trainers') }}" style="color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; text-decoration: none;">
+        &larr; Back to Trainers
+    </a>
 </div>
 
-<table border="1" cellpadding="10" style="border-collapse: collapse; width: 50%;">
-    <tr>
-        <th>ID</th>
-        <td>{{ trainer["trainer_id"] }}</td>
-    </tr>
-    <tr>
-        <th>Full Name</th>
-        <td>{{ trainer["full_name"] }}</td>
-    </tr>
-    <tr>
-        <th>Email</th>
-        <td>{{ trainer["email"] }}</td>
-    </tr>
-    <tr>
-        <th>Phone</th>
-        <td>{{ trainer["phone"] }}</td>
-    </tr>
-    <tr>
-        <th>Skills</th>
-        <td>{{ trainer["skills"] }}</td>
-    </tr>
-    <tr>
-        <th>Experience (Years)</th>
-        <td>{{ trainer["experience"] }}</td>
-    </tr>
-    <tr>
-        <th>Employment Status</th>
-        <td>{{ trainer["status"] }}</td>
-    </tr>
-    <tr>
-        <th>Availability Status</th>
-        <td>{{ trainer["availability"] }}</td>
-    </tr>
-    <tr>
-        <th>Created At</th>
-        <td>{{ trainer["created_at"] }}</td>
-    </tr>
-    <tr>
-        <th>Updated At</th>
-        <td>{{ trainer["updated_at"] }}</td>
-    </tr>
-</table>
+<div class="profile-card">
+    <div class="profile-header">
+        <div class="profile-title-area">
+            <h2>{{ trainer['full_name'] }}</h2>
+            <div class="profile-subtitle">Trainer Profile (ID: {{ trainer['trainer_id'] }})</div>
+        </div>
+    </div>
 
+    <div class="profile-body">
+        <div class="profile-grid">
+            <div>
+                <div class="info-group">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value">{{ trainer['email'] }}</div>
+                </div>
+                <div class="info-group" style="margin-top: 1.5rem;">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value">{{ trainer['phone'] }}</div>
+                </div>
+                <div class="info-group" style="margin-top: 1.5rem;">
+                    <div class="info-label">Date of Joining</div>
+                    <div class="info-value">{{ trainer['date_of_joining'] or 'N/A' }}</div>
+                </div>
+                <div class="info-group" style="margin-top: 1.5rem;">
+                    <div class="info-label">Previous Experience</div>
+                    <div class="info-value">{{ trainer['previous_experience'] }} Years</div>
+                </div>
+                <div class="info-group" style="margin-top: 1.5rem;">
+                    <div class="info-label">Experience in this Organization</div>
+                    <div class="info-value">{{ trainer['this_org_experience'] }} Years</div>
+                </div>
+                <div class="info-group" style="margin-top: 1.5rem;">
+                    <div class="info-label">Total Experience</div>
+                    <div class="info-value">{{ trainer['total_experience'] }} Years</div>
+                </div>
+                <div class="info-group" style="margin-top: 1.5rem;">
+                    <div class="info-label">Qualifications</div>
+                    <div class="info-value">{{ trainer['qualifications'] or 'N/A' }}</div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="info-group" style="border-bottom: none;">
+                    <div class="info-label">Skills & Technology Stack</div>
+                    <div class="skills-container">
+                        {% for skill in trainer['skills'].split(',') %}
+                            {% if skill.strip() %}
+                                <span class="skill-tag">{{ skill.strip() }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-footer">
+        <div class="timestamps">
+            <div><strong>Created By:</strong> {{ trainer['created_by'] or 'N/A' }} at {{ trainer['created_at'] }}</div>
+            <div style="margin-top: 0.25rem;"><strong>Updated By:</strong> {{ trainer['updated_by'] or 'N/A' }} at {{ trainer['updated_at'] }}</div>
+        </div>
+        <div class="actions-row">
+            <a href="{{ url_for('trainer.edit_trainer_page', trainer_id=trainer['trainer_id']) }}" class="btn btn-primary">Edit Details</a>
+            <a href="{{ url_for('attendance.view_attendance') }}" class="btn btn-outline">Manage Availability & Attendance</a>
+            <form action="{{ url_for('trainer.remove_trainer', trainer_id=trainer['trainer_id']) }}" method="POST" class="delete-form" style="display:inline;">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/trainer.js') }}"></script>
 {% endblock %}

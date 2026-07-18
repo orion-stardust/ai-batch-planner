@@ -191,8 +191,8 @@ class CourseService:
         return self.course_model.search_courses(keyword.strip())
 
     # 8. Filter Courses
-    def filter_courses(self, status=None, technology=None, min_duration=None, max_duration=None):
-        return self.course_model.filter_courses(status, technology, min_duration, max_duration)
+    def filter_courses(self, status=None, technology=None, min_duration=None, max_duration=None, keyword=None):
+        return self.course_model.filter_courses(status, technology, min_duration, max_duration, keyword)
 
     # 9. Get Statistics
     def get_statistics(self):

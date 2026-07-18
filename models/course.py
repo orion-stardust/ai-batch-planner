@@ -123,7 +123,7 @@ class CourseModel:
         return [dict(r) for r in rows]
 
 
-    def filter_courses(self,status=None,technology=None,min_duration=None,max_duration=None):
+    def filter_courses(self,status=None,technology=None,min_duration=None,max_duration=None,keyword=None):
         sql="SELECT * FROM Course WHERE 1=1"
         params=[]
         if status:
@@ -134,6 +134,11 @@ class CourseModel:
             sql+=" AND duration_hours>=?"; params.append(min_duration)
         if max_duration is not None:
             sql+=" AND duration_hours<=?"; params.append(max_duration)
+        if keyword:
+            sql+=" AND (course_name LIKE ? OR technology_stack LIKE ? OR description LIKE ?)"
+            like = f"%{keyword}%"
+            params.extend([like, like, like])
+        sql+=" ORDER BY course_name ASC"
         conn=self.get_connection()
         rows=conn.execute(sql,params).fetchall()
         conn.close()

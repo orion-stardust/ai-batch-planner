@@ -1,0 +1,634 @@
+{% extends 'base.html' %}
+
+{% block title %}Trainer Availability & Attendance Management{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @media (min-width: 1024px) {
+        .dashboard-container {
+            grid-template-columns: 3fr 2fr;
+        }
+    }
+
+    .card {
+        background: var(--surface-color);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.75rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 0;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Tabs styling */
+    .tabs-nav {
+        display: flex;
+        gap: 0.5rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.5rem;
+    }
+
+    .tab-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        padding: 0.5rem 1rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+        color: var(--text-main);
+        background: var(--surface-hover);
+    }
+
+    .tab-btn.active {
+        color: white;
+        background: var(--primary);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Controls */
+    .date-picker-form {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .date-label {
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .input-date {
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.4);
+        color: var(--text-main);
+        font-family: inherit;
+        font-size: 0.95rem;
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.825rem;
+        font-weight: 600;
+        border-radius: 9999px;
+    }
+
+    .badge-available {
+        background: rgba(16, 185, 129, 0.15);
+        color: #34d399;
+    }
+
+    .badge-unavailable {
+        background: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+    }
+
+    /* Forms in sidebar */
+    .sidebar-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .form-row label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .btn-submit {
+        background: var(--primary);
+        color: white;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+        background: var(--primary-hover);
+    }
+
+    .btn-secondary-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+    }
+
+    .btn-secondary-outline:hover {
+        background: var(--surface-hover);
+    }
+
+    .btn-danger-small {
+        background: rgba(239, 68, 68, 0.1);
+        color: #f87171;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+        border-radius: 4px;
+    }
+
+    .btn-danger-small:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+    .table-container {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow-x: auto;
+        background: rgba(15, 23, 42, 0.2);
+    }
+
+    .data-table {
+        width: 100%;
+        min-width: 800px;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 0.95rem;
+    }
+
+    .data-table th, .data-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .data-table th {
+        background: rgba(30, 41, 59, 0.5);
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Main Left Panel: Tabs for Dashboard Views -->
+    <div class="card">
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab(event, 'dailyStatusTab')">Daily Availability</button>
+            <button class="tab-btn" onclick="switchTab(event, 'leavesTab')">Availability Overrides</button>
+            <button class="tab-btn" onclick="switchTab(event, 'eventsTab')">Calendar Events</button>
+        </div>
+
+        <!-- Tab 1: Daily Status Table -->
+        <div id="dailyStatusTab" class="tab-content active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-main);">Trainer Status for chosen Date</h3>
+                <form class="date-picker-form" method="GET" action="{{ url_for('attendance.view_attendance') }}">
+                    <label for="datepicker" class="date-label">Date:</label>
+                    <input type="date" id="datepicker" name="date" class="input-date" value="{{ date }}" onchange="this.form.submit()">
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Trainer</th>
+                            <th>Email</th>
+                            <th>Status Today</th>
+                            <th>Type/Reason</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in trainer_statuses %}
+                        <tr>
+                            <td style="font-weight: 500;">
+                                <a href="{{ url_for('trainer.view_trainer_details', trainer_id=t['trainer_id']) }}" style="color: var(--primary); text-decoration: none;">
+                                    {{ t['full_name'] }}
+                                </a>
+                            </td>
+                            <td>{{ t['email'] }}</td>
+                            <td>
+                                {% if t['available'] == 1 %}
+                                    <span class="badge badge-available">Active</span>
+                                {% else %}
+                                    <span class="badge badge-unavailable">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span style="font-size: 0.9rem; font-weight: 500;">
+                                    {{ t['reason'] }}
+                                    {% if t['duration_type'] and t['duration_type'] != 'Full Day' %}
+                                        {% if t['duration_type'] == 'Specific Slot' %}
+                                            ({{ t['time_slot'] or 'Specific Slot' }})
+                                        {% else %}
+                                            ({{ t['duration_type'] }}{% if t['time_slot'] %} - {{ t['time_slot'] }}{% endif %}{% if t['start_time'] %} {{ t['start_time'] }}-{{ t['end_time'] }}{% endif %})
+                                        {% endif %}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td style="color: var(--text-muted); font-size: 0.875rem;">
+                                {{ t['description'] or 'N/A' }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: Registered Leaves/Overrides List -->
+        <div id="leavesTab" class="tab-content">
+            <h3 style="margin: 0 0 1.5rem 0; font-size: 1.15rem; color: var(--text-main);">All Trainer Availability Overrides</h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Trainer Name</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Availability Type</th>
+                            <th>Duration Details</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if not leaves %}
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No availability overrides recorded.</td>
+                        </tr>
+                        {% endif %}
+                        {% for leaf in leaves %}
+                        <tr>
+                            <td style="font-weight: 500;">{{ leaf['full_name'] }}</td>
+                            <td>{{ leaf['date'] }}</td>
+                            <td>
+                                {% if leaf['status'] == 1 %}
+                                    <span class="badge badge-available">Active</span>
+                                {% else %}
+                                    <span class="badge badge-unavailable">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ leaf['availability_type'] }}</td>
+                            <td>
+                                {% if leaf['duration_type'] == 'Specific Slot' %}
+                                    {{ leaf['time_slot'] or 'Specific Slot' }}
+                                {% else %}
+                                    {{ leaf['duration_type'] }}
+                                    {% if leaf['time_slot'] %}({{ leaf['time_slot'] }}){% endif %}
+                                    {% if leaf['start_time'] %}({{ leaf['start_time'] }} - {{ leaf['end_time'] }}){% endif %}
+                                {% endif %}
+                            </td>
+                            <td style="font-size: 0.875rem; color: var(--text-muted);">{{ leaf['description'] or '-' }}</td>
+                            <td>
+                                <form action="{{ url_for('attendance.remove_leave', availability_id=leaf['availability_id']) }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="redirect_date" value="{{ date }}">
+                                    <button type="submit" class="btn btn-danger-small" onclick="return confirm('Delete this availability override?')">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 3: Calendar Events List -->
+        <div id="eventsTab" class="tab-content">
+            <h3 style="margin: 0 0 1.5rem 0; font-size: 1.15rem; color: var(--text-main);">Global Events, Holidays & Meetings</h3>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Event Type</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if not events %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No global events. Use the side panel to import or create events.</td>
+                        </tr>
+                        {% endif %}
+                        {% for event in events %}
+                        <tr>
+                            <td style="font-weight: 500;">{{ event['date'] }}</td>
+                            <td>
+                                <span class="badge {% if event['event_type'] == 'Public Holiday' %}badge-unavailable{% else %}badge-unavailable{% endif %}" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+                                    {{ event['event_type'] }}
+                                </span>
+                            </td>
+                            <td style="font-size: 0.875rem; color: var(--text-muted);">{{ event['description'] or '-' }}</td>
+                            <td>
+                                <form action="{{ url_for('attendance.remove_event', event_id=event['event_id']) }}" method="POST" style="display:inline;">
+                                    <input type="hidden" name="redirect_date" value="{{ date }}">
+                                    <button type="submit" class="btn btn-danger-small" onclick="return confirm('Delete this calendar event?')">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar Panel: Actions Forms -->
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+        
+        <!-- Action 1: Add Availability Override -->
+        <div class="card">
+            <h3 class="card-title">Record Availability Override</h3>
+            <form class="sidebar-form" method="POST" action="{{ url_for('attendance.new_leave') }}">
+                <input type="hidden" name="redirect_date" value="{{ date }}">
+                
+                <div class="form-row">
+                    <label for="trainer_id">Trainer</label>
+                    <select id="trainer_id" name="trainer_id" class="input-date" style="width: 100%;" required>
+                        <option value="">-- Select Trainer --</option>
+                        {% for t in trainers %}
+                            <option value="{{ t['trainer_id'] }}">{{ t['full_name'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="leave_date">Date</label>
+                    <input type="date" id="leave_date" name="date" class="input-date" style="width: 100%;" value="{{ date }}" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="availability_type">Availability Type</label>
+                    <select id="availability_type" name="availability_type" class="input-date" style="width: 100%;" required>
+                        <option value="Available">Available</option>
+                        <option value="Unavailable">Unavailable</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="duration_type">Duration Type</label>
+                    <select id="duration_type" name="duration_type" class="input-date" style="width: 100%;" required>
+                        <option value="Full Day">Full Day</option>
+                        <option value="Half Day">Half Day</option>
+                        <option value="Specific Slot">Specific Slot</option>
+                    </select>
+                </div>
+
+                <div class="form-row" id="slot_row" style="display: none;">
+                    <label for="time_slot">Time Slot</label>
+                    <select id="time_slot" name="time_slot" class="input-date" style="width: 100%;">
+                        <option value="">-- Select Slot --</option>
+                    </select>
+                </div>
+
+                <div class="form-row" id="time_row" style="display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <div>
+                            <label for="start_time">Start Time</label>
+                            <input type="time" id="start_time" name="start_time" class="input-date" style="width: 100%;">
+                        </div>
+                        <div>
+                            <label for="end_time">End Time</label>
+                            <input type="time" id="end_time" name="end_time" class="input-date" style="width: 100%;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="leave_description">Description / Reason</label>
+                    <textarea id="leave_description" name="description" class="input-date" style="width: 100%; min-height: 60px;" placeholder="Reason details..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-submit">Submit Record</button>
+            </form>
+        </div>
+
+        <!-- Action 2: Add Global Calendar Event -->
+        <div class="card">
+            <h3 class="card-title">Add Global Event</h3>
+            <form class="sidebar-form" method="POST" action="{{ url_for('attendance.new_event') }}">
+                <input type="hidden" name="redirect_date" value="{{ date }}">
+                
+                <div class="form-row">
+                    <label for="event_date">Date</label>
+                    <input type="date" id="event_date" name="date" class="input-date" style="width: 100%;" value="{{ date }}" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="event_type">Event Type</label>
+                    <select id="event_type" name="event_type" class="input-date" style="width: 100%;" required>
+                        <option value="Public Holiday">Public Holiday</option>
+                        <option value="Company Meeting">Company Meeting</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="event_description">Event Description</label>
+                    <input type="text" id="event_description" name="description" class="input-date" style="width: 100%;" placeholder="e.g. Christmas, Quarterly Alignment" required>
+                </div>
+
+                <button type="submit" class="btn btn-submit">Create Event</button>
+            </form>
+        </div>
+
+        <!-- Action 3: Auto-Import Public Holidays -->
+        <div class="card">
+            <h3 class="card-title">Import Public Holidays</h3>
+            <p style="margin: 0; font-size: 0.875rem; color: var(--text-muted); line-height: 1.4;">
+                Automatically fetch and save all national/gazetted public holidays for the specified calendar year.
+            </p>
+            <form class="sidebar-form" method="POST" action="{{ url_for('attendance.import_holidays') }}">
+                <input type="hidden" name="redirect_date" value="{{ date }}">
+                
+                <div class="form-row">
+                    <label for="import_year">Calendar Year</label>
+                    <input type="number" id="import_year" name="year" class="input-date" style="width: 100%;" value="{{ year }}" min="2020" max="2035" required>
+                </div>
+
+                <button type="submit" class="btn btn-secondary-outline" style="width: 100%; margin-top: 0.5rem;">Import Calendar Holidays</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function switchTab(evt, tabId) {
+        // Hide all tab contents
+        const tabContents = document.getElementsByClassName("tab-content");
+        for (let i = 0; i < tabContents.length; i++) {
+            tabContents[i].classList.remove("active");
+        }
+
+        // Deactivate all tab buttons
+        const tabButtons = document.getElementsByClassName("tab-btn");
+        for (let i = 0; i < tabButtons.length; i++) {
+            tabButtons[i].classList.remove("active");
+        }
+
+        // Show selected tab content and active state
+        document.getElementById(tabId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    function toggleTimingFields() {
+        const durationType = document.getElementById("duration_type").value;
+        const slotRow = document.getElementById("slot_row");
+        const timeRow = document.getElementById("time_row");
+        const timeSlotSelect = document.getElementById("time_slot");
+        const startTime = document.getElementById("start_time");
+        const endTime = document.getElementById("end_time");
+
+        const currentVal = timeSlotSelect.value;
+        timeSlotSelect.innerHTML = '<option value="">-- Select Slot --</option>';
+
+        if (durationType === "Full Day") {
+            slotRow.style.display = "none";
+            timeRow.style.display = "none";
+            startTime.required = false;
+            endTime.required = false;
+            startTime.value = "";
+            endTime.value = "";
+        } else if (durationType === "Half Day") {
+            slotRow.style.display = "block";
+            timeRow.style.display = "block";
+            startTime.required = true;
+            endTime.required = true;
+            
+            const optMorning = document.createElement("option");
+            optMorning.value = "Morning";
+            optMorning.textContent = "Morning";
+            timeSlotSelect.appendChild(optMorning);
+            
+            const optAfternoon = document.createElement("option");
+            optAfternoon.value = "Afternoon";
+            optAfternoon.textContent = "Afternoon";
+            timeSlotSelect.appendChild(optAfternoon);
+
+            if (currentVal === "Morning" || currentVal === "Afternoon") {
+                timeSlotSelect.value = currentVal;
+            }
+        } else if (durationType === "Specific Slot") {
+            slotRow.style.display = "block";
+            timeRow.style.display = "block";
+            startTime.required = true;
+            endTime.required = true;
+            
+            const slots = ["Slot 1", "Slot 2", "Slot 3", "Slot 4"];
+            slots.forEach(slot => {
+                const opt = document.createElement("option");
+                opt.value = slot;
+                opt.textContent = slot;
+                timeSlotSelect.appendChild(opt);
+            });
+
+            if (slots.includes(currentVal)) {
+                timeSlotSelect.value = currentVal;
+            }
+        }
+    }
+
+    function handleSlotChange() {
+        const durationType = document.getElementById("duration_type").value;
+        const timeSlot = document.getElementById("time_slot").value;
+        const startTime = document.getElementById("start_time");
+        const endTime = document.getElementById("end_time");
+
+        if (durationType === "Specific Slot") {
+            if (timeSlot === "Slot 1") {
+                startTime.value = "09:30";
+                endTime.value = "11:30";
+            } else if (timeSlot === "Slot 2") {
+                startTime.value = "11:45";
+                endTime.value = "13:45";
+            } else if (timeSlot === "Slot 3") {
+                startTime.value = "14:45";
+                endTime.value = "16:45";
+            } else if (timeSlot === "Slot 4") {
+                startTime.value = "17:00";
+                endTime.value = "19:00";
+            } else {
+                startTime.value = "";
+                endTime.value = "";
+            }
+            startTime.readOnly = true;
+            endTime.readOnly = true;
+        } else {
+            startTime.readOnly = false;
+            endTime.readOnly = false;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const durationTypeSelect = document.getElementById("duration_type");
+        const timeSlotSelect = document.getElementById("time_slot");
+        if (durationTypeSelect) {
+            durationTypeSelect.addEventListener("change", function() {
+                toggleTimingFields();
+                handleSlotChange();
+            });
+            toggleTimingFields();
+        }
+        if (timeSlotSelect) {
+            timeSlotSelect.addEventListener("change", handleSlotChange);
+        }
+    });
+</script>
+{% endblock %}

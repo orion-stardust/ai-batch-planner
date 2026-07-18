@@ -1,21 +1,19 @@
-Purpose
-Defines trainer management business rules.
-The Business rules should be followed accurately 
+Purpose: Defines trainer management and availability business rules.
 
+Business Rules:
 
-Business Rules
-BR-01 → Trainer name is mandatory.
-
-BR-02 → Email must be unique.
-
-BR-03 → Phone number must be valid and unique.
-
-BR-04 → Experience cannot be negative.
-
-BR-05 → Trainer status must be Active or Inactive.
-
-BR-06 → Unavailable trainers cannot be assigned.
-
-BR-07 → Deleted trainers cannot be restored without re-registration.
-
-BR-008 → Administrator performs all trainer operations.
+BR-01: Trainer name is mandatory and cannot be empty.
+BR-02: Email address must be unique, non-empty, and valid format.
+BR-03: Phone number must be unique, non-empty, and contain exactly 10 digits.
+BR-04: Experience must be a non-negative integer (>= 0).
+BR-05: Trainer status must be 'Active' or 'Inactive'.
+BR-06: Dynamic Date-Specific Availability Resolution Hierarchy:
+   Availability for any trainer on a given date resolves in the following order:
+   1. Trainer Override: If a record exists in `trainer_availablity` for the trainer and date, resolve to its status (1 = Available, 0 = Unavailable).
+   2. Calendar Event: If a global event exists in `calendar_event` on that date (Public Holiday or Company Meeting), resolve to Unavailable (0).
+   3. Weekends: If the date is Saturday or Sunday, resolve to Unavailable (0).
+   4. Default: Resolve to Available (1).
+BR-07: Audit Tracing:
+   All database writes and updates to the trainer, availability, and calendar tables must record user audit metadata via `created_by` and `updated_by` fields.
+BR-08: Automatic Holidays:
+   Holidays for the India region should be auto-populated for calendar years to prevent manual registration overhead.

@@ -1,22 +1,18 @@
-Purpose of the module: Defines trainer data model responsibilities.
+Purpose: Defines trainer data models and responsibilities.
 
-Responsibilities:
-Store Trainer
-Retrieve Trainer
-Update Trainer
-Delete Trainer
-Search Trainer
-Filter Trainer
-Retrieve Availability
+Model Entities:
 
-Managed Data: 
-Trainer
-Availability
-Skills
-Leave
+1. Trainer Model
+   - Table: trainer
+   - Attributes: trainer_id, full_name, email, phone, skills, qualifications, experience, status, created_at, updated_at, created_by, updated_by.
+   - Operations: Insert, update, query all, query by id, delete.
 
+2. Trainer Availability Model
+   - Table: trainer_availablity
+   - Attributes: availability_id, trainer_id, date, status, availability_type, duration_type, time_slot, start_time, end_time, description, created_at, updated_at, created_by, updated_by.
+   - Operations: Fetch availability records for trainer, insert override, update override, delete override.
 
-Future:
-Batch Mapping
-Attendance Mapping
-Reports
+3. Calendar Event Model
+   - Table: calendar_event
+   - Attributes: event_id, date, event_type, description, created_at, updated_at, created_by, updated_by.
+   - Operations: Fetch all events, insert event, delete event.

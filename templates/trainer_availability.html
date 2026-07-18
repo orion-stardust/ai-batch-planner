@@ -1,63 +1,159 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}
-Trainer Availability
-{% endblock %}
+{% block title %}Update Trainer Availability{% endblock %}
 
 {% block content %}
+<style>
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: var(--surface-color);
+        padding: 2.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
 
-<h2>Update Trainer Availability</h2>
+    .form-header {
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1rem;
+    }
 
-<form
-    action="{{ url_for('trainer.update_availability', trainer_id=trainer['trainer_id']) }}"
-    method="POST"
->
+    .form-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--text-main);
+    }
 
-    <p>
-        <strong>Name:</strong>
-        {{ trainer["full_name"] }}
-    </p>
+    .meta-info {
+        background: rgba(15, 23, 42, 0.3);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
 
-    <p>
-        <strong>Status:</strong>
-        {{ trainer["status"] }}
-    </p>
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
 
-    <label for="availability">
-        Availability
-    </label>
+    .meta-row:last-child {
+        margin-bottom: 0;
+    }
 
-    <select
-        id="availability"
-        name="availability"
-    >
+    .meta-label {
+        color: var(--text-muted);
+        font-weight: 500;
+    }
 
-        <option
-            value="Available"
-            {% if trainer["availability"] == "Available" %}selected{% endif %}
-        >
-            Available
-        </option>
+    .meta-value {
+        color: var(--text-main);
+        font-weight: 600;
+    }
 
-        <option
-            value="Unavailable"
-            {% if trainer["availability"] == "Unavailable" %}selected{% endif %}
-        >
-            Unavailable
-        </option>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
 
-    </select>
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
 
-    <br><br>
+    .form-control {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-sizing: border-box;
+    }
 
-    <button type="submit">
-        Update Availability
-    </button>
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
 
-    <a href="{{ url_for('trainer.view_trainers') }}">
-        Cancel
-    </a>
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
 
-</form>
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        text-decoration: none;
+        font-family: inherit;
+        font-size: 1rem;
+    }
 
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+        background: var(--surface-hover);
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-header">
+        <h2>Update Availability</h2>
+    </div>
+
+    <div class="meta-info">
+        <div class="meta-row">
+            <span class="meta-label">Trainer Name:</span>
+            <span class="meta-value">{{ trainer['full_name'] }}</span>
+        </div>
+        <div class="meta-row">
+            <span class="meta-label">Employment Status:</span>
+            <span class="meta-value">{{ trainer['status'] }}</span>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('trainer.update_availability', trainer_id=trainer['trainer_id']) }}">
+        
+        <div class="form-group">
+            <label class="form-label" for="availability">Availability Status</label>
+            <select id="availability" name="availability" class="form-control">
+                <option value="Available" {% if trainer['availability'] == 'Available' %}selected{% endif %}>Available</option>
+                <option value="Unavailable" {% if trainer['availability'] == 'Unavailable' %}selected{% endif %}>Unavailable</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('trainer.view_trainers') }}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update Availability</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

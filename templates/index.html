@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Batch Planner - Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Stats Grid & Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+        background: var(--surface-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.3);
+    }
+
+    .stat-title {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-top: 0.5rem;
+        color: #fff;
+    }
+
+    /* Hero/Welcome Section */
+    .hero-section {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(167, 139, 250, 0.12) 100%);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+        filter: blur(50px);
+        pointer-events: none;
+    }
+
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        bottom: -50%;
+        left: -10%;
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(circle, rgba(167, 139, 250, 0.15) 0%, transparent 70%);
+        filter: blur(40px);
+        pointer-events: none;
+    }
+
+    .hero-title {
+        font-size: 2.25rem;
+        font-weight: 800;
+        margin: 0 0 0.5rem 0;
+        background: linear-gradient(90deg, #60a5fa, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.02em;
+    }
+
+    .hero-desc {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        max-width: 600px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Dashboard Grid Layout */
+    .dashboard-grid {
+        display: block;
+        margin-bottom: 3rem;
+    }
+
+    /* Section Cards */
+    .panel-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.75rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Quick Actions */
+    .action-button-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.3);
+        border: 1px solid var(--border);
+        text-decoration: none;
+        color: var(--text-main);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        gap: 1rem;
+    }
+
+    .action-item:hover {
+        background: var(--surface-hover);
+        border-color: var(--primary);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+        text-decoration: none;
+    }
+
+    .action-item-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary);
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        transition: all 0.2s;
+    }
+
+    .action-item:hover .action-item-icon {
+        background: var(--primary);
+        color: #fff;
+    }
+
+    .action-item-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .action-item-title {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #fff;
+    }
+
+    .action-item-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 0.15rem;
+    }
+
+    /* Overview list details */
+    .overview-table-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .overview-list-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .overview-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        background: rgba(15, 23, 42, 0.25);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+
+    .overview-row:hover {
+        background: rgba(15, 23, 42, 0.4);
+        border-color: var(--surface-hover);
+    }
+
+    .overview-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .overview-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    .overview-avatar.course-avatar {
+        background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+        border-radius: 8px;
+    }
+
+    .overview-meta {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .overview-name {
+        font-weight: 600;
+        color: #fff;
+        font-size: 0.95rem;
+    }
+
+    .overview-sub {
+        font-size: 0.825rem;
+        color: var(--text-muted);
+        margin-top: 0.15rem;
+    }
+
+    .overview-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    /* General Badge Tweaks */
+    .view-link {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--primary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        transition: color 0.2s;
+    }
+
+    .view-link:hover {
+        color: var(--primary-hover);
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<div class="hero-section">
+    <h1 class="hero-title">AI Batch Planner Dashboard</h1>
+    <p class="hero-desc">Efficiently coordinate and manage batch schedules, course allocations, trainer availabilities, and attendance tracking all in one centralized hub.</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-title">Total Trainers</div>
+        <div class="stat-value">{{ trainer_stats.total_trainers }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-title">Total Courses</div>
+        <div class="stat-value">{{ course_stats.total_courses }}</div>
+    </div>
+</div>
+
+<!-- Main Dashboard Layout -->
+<div class="dashboard-grid">
+    
+    <!-- Quick Actions Panel -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <h2 class="panel-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Quick Operations
+            </h2>
+        </div>
+        <div class="action-button-list">
+            <a href="{{ url_for('course_bp.create_course') }}" class="action-item">
+                <div class="action-item-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                </div>
+                <div class="action-item-info">
+                    <span class="action-item-title">Add New Course</span>
+                    <span class="action-item-desc">Create curriculum & define duration</span>
+                </div>
+            </a>
+            <a href="{{ url_for('trainer.add_trainer') }}" class="action-item">
+                <div class="action-item-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
+                </div>
+                <div class="action-item-info">
+                    <span class="action-item-title">Register Trainer</span>
+                    <span class="action-item-desc">Onboard a new instructor</span>
+                </div>
+            </a>
+            <a href="{{ url_for('attendance.view_attendance') }}" class="action-item">
+                <div class="action-item-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="action-item-info">
+                    <span class="action-item-title">Track Attendance</span>
+                    <span class="action-item-desc">Log leaves & holiday calendar</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

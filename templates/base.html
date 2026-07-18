@@ -50,16 +50,95 @@
             -webkit-text-fill-color: transparent;
         }
 
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-nav a,
+        .navbar-nav .dropdown {
+            margin-left: 1.5rem;
+        }
+
         .navbar-nav a {
             color: var(--text-main);
             text-decoration: none;
-            margin-left: 1.5rem;
             font-weight: 500;
             transition: color 0.2s;
         }
 
         .navbar-nav a:hover {
             color: var(--primary);
+        }
+
+        /* Dropdown menus for Courses and Trainers */
+        .dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-btn {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+            font-size: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 0;
+        }
+
+        .dropdown-btn:hover {
+            color: var(--primary);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 1.5rem;
+            background-color: var(--surface-color);
+            min-width: 200px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            z-index: 100;
+            margin-top: 0.5rem;
+            overflow: hidden;
+            animation: fadeIn 0.15s ease-out;
+        }
+
+        .dropdown-content a {
+            color: var(--text-main);
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            margin: 0 !important;
+            font-size: 0.95rem;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .dropdown-content a:hover {
+            background-color: var(--surface-hover);
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .dropdown.is-active .dropdown-content {
+            display: block;
+        }
+
+        /* Align dropdown right for overflow prevention */
+        .dropdown-content.dropdown-right {
+            left: auto !important;
+            right: 0 !important;
         }
 
         /* Container */
@@ -146,6 +225,38 @@
             background-color: var(--primary-hover);
         }
 
+        /* Global Button, Input, Select, and Form Alignment Overrides */
+        .btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-sizing: border-box !important;
+            vertical-align: middle !important;
+        }
+
+        .form-actions {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            gap: 1rem !important;
+        }
+
+        .search-form {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+
+        .search-form .input-control,
+        .search-form select,
+        .search-form input,
+        .search-form button,
+        .search-form .btn {
+            margin: 0 !important;
+            box-sizing: border-box !important;
+            vertical-align: middle !important;
+        }
+
         /* Tables */
         table {
             width: 100%;
@@ -196,6 +307,7 @@
             margin-top: auto;
         }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
@@ -203,9 +315,29 @@
         <a href="/" class="navbar-brand">AI Batch Planner</a>
         <div class="navbar-nav">
             <a href="/">Home</a>
-            <a href="/courses/">Courses</a>
-            <a href="{{ url_for('trainer.view_trainers') }}">Trainers List</a>
-            <a href="{{ url_for('trainer.add_trainer') }}">Add Trainer</a>
+            
+            <div class="dropdown">
+                <button class="dropdown-btn">
+                    Courses
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('course_bp.list_courses') }}">View Courses</a>
+                    <a href="{{ url_for('course_bp.create_course') }}">Add Course</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button class="dropdown-btn">
+                    Trainers
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="dropdown-content dropdown-right">
+                    <a href="{{ url_for('trainer.view_trainers') }}">View Trainers</a>
+                    <a href="{{ url_for('trainer.add_trainer') }}">Add Trainer</a>
+                    <a href="{{ url_for('attendance.view_attendance') }}">Attendance & Availability</a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -232,5 +364,36 @@
     <script src="{{ url_for('static', filename='js/course.js') }}"></script>
     {% block scripts %}{% endblock %}
 
+    <script>
+        document.querySelectorAll('.dropdown').forEach(dropdown => {
+            let timeoutId = null;
+
+            dropdown.addEventListener('mouseenter', () => {
+                // Close all other dropdowns immediately
+                document.querySelectorAll('.dropdown').forEach(other => {
+                    if (other !== dropdown) {
+                        other.classList.remove('is-active');
+                        if (other.timeoutId) {
+                            clearTimeout(other.timeoutId);
+                            other.timeoutId = null;
+                        }
+                    }
+                });
+
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    timeoutId = null;
+                }
+                dropdown.classList.add('is-active');
+            });
+
+            dropdown.addEventListener('mouseleave', () => {
+                timeoutId = setTimeout(() => {
+                    dropdown.classList.remove('is-active');
+                }, 3000);
+                dropdown.timeoutId = timeoutId;
+            });
+        });
+    </script>
 </body>
 </html>

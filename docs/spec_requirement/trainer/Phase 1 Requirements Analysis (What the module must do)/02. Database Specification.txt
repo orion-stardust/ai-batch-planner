@@ -1,43 +1,46 @@
-Purpose: POST the trainer details and GET or retrieving the details with other modules. Defines trainer-related data requirements.
+Purpose: Defines the database schema, tables, fields, constraints, and relationships for trainers, date-specific leaves, and calendar events.
 
-Sections
-Table Name
-Trainer
+Tables:
 
-Entities:
-Trainer
-Trainer Availability
-Trainer Skills
-Trainer Leave
+1. Table Name: trainer
+Fields:
+- trainer_id: INTEGER PRIMARY KEY AUTOINCREMENT (Unique identifier)
+- full_name: TEXT NOT NULL (Trainer's full name)
+- email: TEXT NOT NULL UNIQUE (Unique email address)
+- phone: TEXT NOT NULL UNIQUE (Unique phone number)
+- skills: TEXT NOT NULL (Comma-separated list of skills)
+- qualifications: TEXT (Academic and professional qualifications)
+- experience: INTEGER NOT NULL CHECK (experience >= 0) (Years of experience, non-negative)
+- status: TEXT NOT NULL CHECK (status IN ('Active', 'Inactive')) (Employment status)
+- created_at: TIMESTAMP DEFAULT CURRENT_TIMESTAMP (Creation timestamp)
+- updated_at: TIMESTAMP DEFAULT CURRENT_TIMESTAMP (Last update timestamp)
+- created_by: TEXT (Username/system role of creator)
+- updated_by: TEXT (Username/system role of editor)
 
-Fields - 
-Trainer ID
-Full Name
-Email
-Phone Number
-Skills
-Experience (Years)
-Status (Active / Inactive)
-Availability
-Created Date
-Updated Date
+2. Table Name: trainer_availablity (Child table of trainer)
+Fields:
+- availability_id: INTEGER PRIMARY KEY AUTOINCREMENT
+- trainer_id: INTEGER NOT NULL (References trainer.trainer_id, ON DELETE CASCADE)
+- date: TEXT NOT NULL (ISO date format YYYY-MM-DD)
+- status: INTEGER NOT NULL CHECK(status IN (0, 1)) (0 = Unavailable, 1 = Available)
+- availability_type: TEXT NOT NULL CHECK(availability_type IN ('Available', 'Unavailable'))
+- duration_type: TEXT NOT NULL CHECK(duration_type IN ('Full Day', 'Half Day', 'Specific Slot'))
+- time_slot: TEXT (e.g. Slot 1, Slot 2, Slot 3, Slot 4)
+- start_time: TEXT (HH:MM format)
+- end_time: TEXT (HH:MM format)
+- description: TEXT (Reason/description)
+- created_at, updated_at, created_by, updated_by: Audit fields
+Constraints: UNIQUE(trainer_id, date) (Only one override per trainer per day)
 
-columns For each field - Name Data Type Required Default Description
-
-Example: Trainer Name Type VARCHAR Required Yes Description
-
-Constraints or the rules of the module are:
-Trainer ID is unique.
-Email unique 
-Phone unique
-Experience >=0
-Required fields cannot be empty.
+3. Table Name: calendar_event
+Fields:
+- event_id: INTEGER PRIMARY KEY AUTOINCREMENT
+- date: TEXT NOT NULL UNIQUE (ISO date format YYYY-MM-DD)
+- event_type: TEXT NOT NULL CHECK(event_type IN ('Public Holiday', 'Company Meeting'))
+- description: TEXT (Event name/description)
+- created_at, updated_at, created_by, updated_by: Audit fields
 
 
 Relationships:
-Trainer → Availability → Leave
-
-In future we will connect relationship with
-Batch Assignment
-Attendance
-AI Recommendation
+- trainer (Parent) → trainer_availablity (Child) (1-to-many relationship, cascade delete on trainer_id).
+- calendar_event (Independent lookup table for global availability calculations).

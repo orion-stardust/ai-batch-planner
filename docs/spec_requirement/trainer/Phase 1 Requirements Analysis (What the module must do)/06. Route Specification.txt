@@ -1,49 +1,66 @@
-Purpose of the module: Defines application routes.
+Purpose: Defines web application routes and controller actions.
 
-Route - Create Trainer
-Method
-POST
-Input
-Trainer Details
-Output
-Trainer Created
+Trainer Management Routes:
 
-Route - View Trainers
-Method
-GET
-Input
-None
-Output
-Trainer List
+1. Route: GET /trainers
+   - Description: Lists all trainers. Supports search (keyword query param) and status filtering.
+   - Response: Render trainers.html
 
-Route - Edit Trainer
-Method
-PUT
-Input
-Trainer Details
-Output
-Trainer Updated
+2. Route: GET /trainers/new
+   - Description: Displays form to create a new trainer.
+   - Response: Render trainer_form.html
 
-Route - Delete Trainer
-Method
-DELETE
-Input
-Trainer ID
-Output
-Trainer Deleted
+3. Route: POST /trainers
+   - Description: Handles trainer creation submission.
+   - Input (Form): full_name, email, phone, skills, experience, status, qualifications.
+   - Response: Redirect to GET /trainers
 
-Route - Search Trainer
-Method
-GET
-Input
-Keyword
-Output
-Matching Trainers
+4. Route: GET /trainers/<int:trainer_id>
+   - Description: Displays a single trainer's full details (skills, qualifications, audit fields).
+   - Response: Render trainer_details.html
 
-Route - Filter Trainer
-Method
-GET
-Input
-Filter Values
-Output
-Filtered Trainers
+5. Route: GET /trainers/<int:trainer_id>/edit
+   - Description: Displays form to edit trainer details.
+   - Response: Render edit_trainer.html
+
+6. Route: POST /trainers/<int:trainer_id>/edit
+   - Description: Handles trainer edit submission.
+   - Input (Form): full_name, email, phone, skills, experience, status, qualifications.
+   - Response: Redirect to GET /trainers/<int:trainer_id>
+
+7. Route: POST /trainers/<int:trainer_id>/delete
+   - Description: Handles trainer deletion.
+   - Response: Redirect to GET /trainers
+
+
+Attendance & Leaves Management Routes:
+
+1. Route: GET /attendance
+   - Description: Displays dashboard including daily availability resolver, registered leaves/overrides, and global events list.
+   - Query Parameters: date (ISO format YYYY-MM-DD, defaults to today)
+   - Response: Render attendance.html
+
+2. Route: POST /attendance/availability/new
+   - Description: Submits a new trainer availability/override record.
+   - Input (Form): trainer_id, date, availability_type (Available, Unavailable), duration_type (Full Day, Half Day, Specific Slot), time_slot, start_time, end_time, description.
+   - Response: Redirect to GET /attendance?date=<selected_date>
+
+3. Route: POST /attendance/availability/<int:availability_id>/delete
+   - Description: Deletes a trainer availability/override record.
+   - Input (Form): redirect_date
+   - Response: Redirect to GET /attendance?date=<redirect_date>
+
+4. Route: POST /attendance/event/new
+   - Description: Creates a new global calendar event.
+   - Input (Form): date, event_type (Public Holiday, Company Meeting), description, redirect_date.
+   - Response: Redirect to GET /attendance?date=<redirect_date>
+
+5. Route: POST /attendance/event/import
+   - Description: Automatically imports holidays for the specified year.
+   - Input (Form): year, redirect_date.
+   - Response: Redirect to GET /attendance?date=<redirect_date>
+
+6. Route: POST /attendance/event/<int:event_id>/delete
+   - Description: Deletes a global calendar event.
+   - Input (Form): redirect_date
+   - Response: Redirect to GET /attendance?date=<redirect_date>

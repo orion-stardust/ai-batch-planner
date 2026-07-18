@@ -33,11 +33,10 @@ Trainer
    │
    ├── Batch (Future)
    ├── Attendance (Future)
-   ├── Leave (Future)
+   ├── Availability Overrides (trainer_availablity)
    └── Reviews (Future)
 
 
 Future Database Expansion:
 Trainer Leave Table
-Trainer Availability Table
 Trainer Skill Mapping Table

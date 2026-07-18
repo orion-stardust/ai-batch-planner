@@ -1,29 +1,30 @@
-Purpose of the module: Defines trainer business services.
+Purpose: Defines business layer service operations and interface boundaries.
 
-Services:
-Create Trainer
-Validate Trainer
-Update Trainer
-Delete Trainer
-Search Trainer
-Filter Trainer
-Check Availability
+Trainer Services:
+1. create_trainer(data, created_by)
+   - Validates fields, sets created_by, and inserts new record.
+2. update_trainer(trainer_id, data, updated_by)
+   - Validates fields, updates record, and sets updated_by.
+3. validate_trainer_data(data, is_update, current_id)
+   - Custom validator enforcing mandatory fields, valid phone length (10 digits), positive experience, and unique email/phone constraints.
+4. delete_trainer(trainer_id)
+   - Removes trainer and cascaded availability records.
+5. get_all_trainers() / get_trainer_by_id(trainer_id)
+   - Retrieves trainer documents.
+6. search_and_filter_trainers(query, status)
+   - Matches keywords in name, skills, and qualifications, and filters by status.
 
-
-Inputs:
-Trainer Information
-Trainer ID
-Search Keyword
-Filter Criteria
-
-
-Outputs:
-Success
-Failure
-Validation Errors
-Trainer Data
+Attendance & Leaves Services:
+1. determine_trainer_availability(trainer_id, date_str)
+   - Implements the hierarchical availability state resolution on a given date.
+   - Returns availability status (1 = Available, 0 = Unavailable), availability type, description, duration type, time slot, start time, and end time.
+2. get_trainer_availabilities(trainer_id) / create_trainer_availability(...) / update_trainer_availability(...) / delete_trainer_availability(availability_id)
+   - Manages CRUD operations on trainer-specific availability overrides.
+3. get_all_calendar_events() / create_calendar_event(...) / delete_calendar_event(event_id)
+   - Manages CRUD operations on global calendar events.
+4. populate_calendar_holidays_if_needed(year)
+   - Automatically downloads and imports Indian public holidays for the specified year if not already cached.
 
 Dependencies:
-Trainer Model
-Database
-Future AI Module
+- SQLite Database Connector
+- python-holidays package

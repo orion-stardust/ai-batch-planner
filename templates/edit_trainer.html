@@ -1,94 +1,208 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}
-Edit Trainer
-{% endblock %}
+{% block title %}Edit Trainer{% endblock %}
 
 {% block content %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: var(--surface-color);
+        padding: 2.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
 
-<h2>Edit Trainer</h2>
+    .form-header {
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1rem;
+    }
 
-<form
-    action="{{ url_for('trainer.edit_trainer', trainer_id=trainer['trainer_id']) }}"
-    method="POST"
->
+    .form-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--text-main);
+    }
 
-    <label for="full_name">Full Name</label>
-    <input
-        type="text"
-        id="full_name"
-        name="full_name"
-        value="{{ trainer['full_name'] }}"
-        required
-    >
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
 
-    <label for="email">Email</label>
-    <input
-        type="email"
-        id="email"
-        name="email"
-        value="{{ trainer['email'] }}"
-        required
-    >
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
 
-    <label for="phone">Phone</label>
-    <input
-        type="text"
-        id="phone"
-        name="phone"
-        value="{{ trainer['phone'] }}"
-        required
-    >
+    .form-control {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-sizing: border-box;
+    }
 
-    <label for="skills">Skills</label>
-    <input
-        type="text"
-        id="skills"
-        name="skills"
-        value="{{ trainer['skills'] }}"
-        required
-    >
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
 
-    <label for="experience">Experience (Years)</label>
-    <input
-        type="number"
-        id="experience"
-        name="experience"
-        min="0"
-        value="{{ trainer['experience'] }}"
-        required
-    >
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
 
-    <label for="status">Status</label>
-    <select id="status" name="status" required>
-        <option value="Active" {% if trainer['status'] == 'Active' %}selected{% endif %}>Active</option>
-        <option value="Inactive" {% if trainer['status'] == 'Inactive' %}selected{% endif %}>Inactive</option>
-    </select>
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        text-decoration: none;
+        font-family: inherit;
+        font-size: 1rem;
+    }
 
-    <label for="availability">Availability</label>
-    <select
-        id="availability"
-        name="availability"
-        required
-    >
-        <option
-            value="Available"
-            {% if trainer['availability'] == 'Available' %}selected{% endif %}
-        >
-            Available
-        </option>
-        <option
-            value="Unavailable"
-            {% if trainer['availability'] == 'Unavailable' %}selected{% endif %}
-        >
-            Unavailable
-        </option>
-    </select>
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
 
-    <button type="submit">
-        Update Trainer
-    </button>
+    .btn-primary:hover {
+        background: var(--primary-hover);
+    }
 
-</form>
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+    }
 
+    .btn-outline:hover {
+        background: var(--surface-hover);
+    }
+
+    /* Skills Grid Styles */
+    .skills-grid-container {
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 8px;
+        padding: 1rem;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .skills-checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+    }
+
+    .skills-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 6px 8px;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+    }
+
+    .skills-checkbox-item:hover {
+        background-color: var(--surface-hover);
+    }
+
+    .skills-checkbox-item input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--primary);
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .skills-checkbox-label {
+        font-size: 0.95rem;
+        color: var(--text-main);
+        cursor: pointer;
+        user-select: none;
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-header">
+        <h2>Edit Trainer Profile</h2>
+    </div>
+
+    <form id="trainerForm" method="POST" action="{{ url_for('trainer.edit_trainer', trainer_id=trainer['trainer_id']) }}">
+        
+        <div class="form-group">
+            <label class="form-label" for="full_name">Full Name</label>
+            <input type="text" id="full_name" name="full_name" class="form-control" value="{{ trainer['full_name'] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" value="{{ trainer['email'] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone" class="form-control" value="{{ trainer['phone'] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Skills (Select from Added Courses)</label>
+            <div class="skills-grid-container">
+                <div class="skills-checkbox-grid">
+                    {% for course in courses %}
+                    <label class="skills-checkbox-item">
+                        <input type="checkbox" name="skills" value="{{ course.course_name }}" {% if course.course_name in current_skills %}checked{% endif %}>
+                        <span class="skills-checkbox-label">{{ course.course_name }}</span>
+                    </label>
+                    {% else %}
+                    <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 1rem;">
+                        No courses added yet. Please <a href="{{ url_for('course_bp.create_course') }}" style="color: var(--primary); text-decoration: underline;">add a course</a> first.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="date_of_joining">Date of Joining</label>
+            <input type="date" id="date_of_joining" name="date_of_joining" class="form-control" value="{{ trainer['date_of_joining'] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="previous_experience">Previous Experience (Years)</label>
+            <input type="number" step="0.1" id="previous_experience" name="previous_experience" class="form-control" min="0" value="{{ trainer['previous_experience'] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="qualifications">Qualifications</label>
+            <input type="text" id="qualifications" name="qualifications" class="form-control" value="{{ trainer['qualifications'] or '' }}" placeholder="e.g. B.Tech, M.S., AWS Certified">
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('trainer.view_trainers') }}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">Update Trainer</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/trainer.js') }}"></script>
 {% endblock %}

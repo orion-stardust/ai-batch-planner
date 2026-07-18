@@ -50,6 +50,8 @@
 
     .search-form {
         display: flex;
+        flex-direction: row;
+        align-items: center;
         gap: 0.5rem;
     }
 
@@ -62,6 +64,8 @@
         font-family: inherit;
         outline: none;
         transition: border-color 0.2s;
+        height: 38px;
+        box-sizing: border-box;
     }
 
     .input-control:focus {
@@ -76,8 +80,16 @@
         border: none;
         transition: all 0.2s;
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         font-family: inherit;
+        box-sizing: border-box;
+    }
+
+    .search-form .btn {
+        height: 38px;
+        box-sizing: border-box;
     }
 
     .btn-primary {
@@ -178,6 +190,37 @@
     .actions-group {
         display: flex;
         gap: 0.5rem;
+        align-items: center;
+    }
+
+    .actions-group a, .actions-group form {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 100px !important;
+        width: 100px !important;
+        height: 32px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .actions-group a, .actions-group button {
+        font-size: 0.875rem !important;
+        line-height: 1 !important;
+        border-radius: 6px !important;
+        font-weight: 600 !important;
+    }
+
+    .actions-group button {
+        width: 100% !important;
+        height: 100% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
     }
 </style>
 
@@ -195,10 +238,6 @@
         <div class="stat-title">Inactive Courses</div>
         <div class="stat-value">{{ stats.inactive_courses }}</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-title">Avg. Duration</div>
-        <div class="stat-value">{{ "%.1f"|format(stats.average_duration or 0) }}h</div>
-    </div>
 </div>
 
 <!-- Toolbar -->
@@ -206,7 +245,7 @@
     <form class="search-form" action="{{ url_for('course_bp.list_courses') }}" method="GET">
         <input type="text" name="keyword" class="input-control" placeholder="Search courses..." value="{{ request.args.get('keyword', '') }}">
         <select name="status" class="input-control">
-            <option value="">All Statuses</option>
+            <option value="">All Status</option>
             <option value="Active" {% if request.args.get('status') == 'Active' %}selected{% endif %}>Active</option>
             <option value="Inactive" {% if request.args.get('status') == 'Inactive' %}selected{% endif %}>Inactive</option>
         </select>
@@ -234,7 +273,7 @@
         <tbody>
             {% for course in courses %}
             <tr class="course-row" data-status="{{ course.status }}">
-                <td style="font-weight: 500;">{{ course.course_name }}</td>
+                <td style="font-weight: 500; white-space: nowrap;">{{ course.course_name }}</td>
                 <td>{{ course.technology_stack }}</td>
                 <td>{{ course.duration_hours }} hrs</td>
                 <td>
@@ -246,12 +285,7 @@
                     <div class="actions-group">
                         <a href="{{ url_for('course_bp.edit_course', course_id=course.id) }}" class="btn btn-secondary">Edit</a>
                         
-                        <form action="{{ url_for('course_bp.update_status', course_id=course.id) }}" method="POST" style="display:inline;">
-                            <input type="hidden" name="status" value="{% if course.status == 'Active' %}Inactive{% else %}Active{% endif %}">
-                            <button type="submit" class="btn btn-secondary">Toggle Status</button>
-                        </form>
-
-                        <form action="{{ url_for('course_bp.delete_course', course_id=course.id) }}" method="POST" class="delete-form" style="display:inline;">
+                        <form action="{{ url_for('course_bp.delete_course', course_id=course.id) }}" method="POST" class="delete-form">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </div>

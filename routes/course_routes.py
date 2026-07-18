@@ -10,10 +10,8 @@ def list_courses():
     keyword = request.args.get('keyword', '').strip()
     status = request.args.get('status', '').strip()
     
-    if keyword:
-        courses = course_service.search_courses(keyword)
-    elif status:
-        courses = course_service.filter_courses(status=status)
+    if keyword or status:
+        courses = course_service.filter_courses(status=status, keyword=keyword)
     else:
         courses = course_service.get_all_courses()
         
@@ -45,6 +43,14 @@ def create_course():
             return redirect(url_for('course_bp.list_courses'))
         except ValueError as e:
             flash(str(e), "error")
+            temp_course = {
+                'course_name': course_name,
+                'technology_stack': technology_stack,
+                'duration_hours': duration_hours,
+                'description': description,
+                'status': status
+            }
+            return render_template('course_form.html', course=temp_course)
             
     # Expects a templates/course_form.html to render
     return render_template('course_form.html', course=None)
@@ -80,6 +86,15 @@ def edit_course(course_id):
             return redirect(url_for('course_bp.list_courses'))
         except ValueError as e:
             flash(str(e), "error")
+            temp_course = {
+                'id': course_id,
+                'course_name': course_name,
+                'technology_stack': technology_stack,
+                'duration_hours': duration_hours,
+                'description': description,
+                'status': status
+            }
+            return render_template('course_form.html', course=temp_course)
             
     return render_template('course_form.html', course=course)
 

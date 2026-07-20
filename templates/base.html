@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,6 +66,9 @@
             text-decoration: none;
             font-weight: 500;
             transition: color 0.2s;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
         }
 
         .navbar-nav a:hover {
@@ -92,7 +96,10 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            margin-left: 0;
+            margin: 0;
+            line-height: 1;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .dropdown-btn:hover {
@@ -156,7 +163,8 @@
             margin-bottom: 2rem;
         }
 
-        .flash-message, .flash {
+        .flash-message,
+        .flash {
             padding: 1rem 1.5rem;
             border-radius: 8px;
             margin-bottom: 1rem;
@@ -167,21 +175,30 @@
             align-items: center;
         }
 
-        .flash-success, .success {
+        .flash-success,
+        .success {
             background-color: rgba(16, 185, 129, 0.1);
             color: var(--success);
             border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
-        .flash-error, .error {
+        .flash-error,
+        .error {
             background-color: rgba(239, 68, 68, 0.1);
             color: var(--danger);
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Forms */
@@ -191,12 +208,16 @@
             gap: 12px;
             max-width: 500px;
         }
+
         label {
             font-weight: 600;
             color: var(--text-main);
             margin-top: 5px;
         }
-        input, select, textarea {
+
+        input,
+        select,
+        textarea {
             padding: 10px 14px;
             background-color: var(--surface-color);
             border: 1px solid var(--border);
@@ -205,10 +226,14 @@
             font-size: 1rem;
             transition: border-color 0.2s;
         }
-        input:focus, select:focus, textarea:focus {
+
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--primary);
         }
+
         button {
             padding: 10px 15px;
             background-color: var(--primary);
@@ -221,6 +246,7 @@
             transition: background-color 0.2s;
             margin-top: 10px;
         }
+
         button:hover {
             background-color: var(--primary-hover);
         }
@@ -232,6 +258,7 @@
             justify-content: center !important;
             box-sizing: border-box !important;
             vertical-align: middle !important;
+            margin: 0 !important;
         }
 
         .form-actions {
@@ -267,31 +294,39 @@
             overflow: hidden;
             border: 1px solid var(--border);
         }
-        th, td {
+
+        th,
+        td {
             text-align: left;
             padding: 14px;
             border-bottom: 1px solid var(--border);
         }
+
         th {
             background-color: rgba(30, 41, 59, 0.5);
             color: var(--text-main);
             font-weight: 600;
         }
+
         td {
             color: var(--text-muted);
         }
+
         tr:hover {
             background-color: var(--surface-hover);
         }
+
         tr:last-child td {
             border-bottom: none;
         }
+
         a {
             color: var(--primary);
             text-decoration: none;
             font-weight: 500;
             transition: color 0.2s;
         }
+
         a:hover {
             color: var(--primary-hover);
             text-decoration: underline;
@@ -309,17 +344,21 @@
     </style>
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
 
     <nav class="navbar">
         <a href="/" class="navbar-brand">AI Batch Planner</a>
         <div class="navbar-nav">
             <a href="/">Home</a>
-            
+
             <div class="dropdown">
                 <button class="dropdown-btn">
                     Courses
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
                 </button>
                 <div class="dropdown-content">
                     <a href="{{ url_for('course_bp.list_courses') }}">View Courses</a>
@@ -330,7 +369,10 @@
             <div class="dropdown">
                 <button class="dropdown-btn">
                     Trainers
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
                 </button>
                 <div class="dropdown-content dropdown-right">
                     <a href="{{ url_for('trainer.view_trainers') }}">View Trainers</a>
@@ -344,16 +386,16 @@
     <main class="container">
         <div class="flash-container">
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="flash-message flash-{{ category }}">
-                            <span>{{ message }}</span>
-                        </div>
-                    {% endfor %}
-                {% endif %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+            {% endif %}
             {% endwith %}
         </div>
-        
+
         {% block content %}{% endblock %}
     </main>
 
@@ -396,4 +438,5 @@
         });
     </script>
 </body>
+
 </html>

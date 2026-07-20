@@ -76,6 +76,10 @@
         text-decoration: none;
         font-family: inherit;
         font-size: 1rem;
+        height: 46px;
+        line-height: 1;
+        -webkit-appearance: none;
+        appearance: none;
     }
 
     .btn-primary {
@@ -103,37 +107,40 @@
         <h2>{% if course %}Edit Course{% else %}Create New Course{% endif %}</h2>
     </div>
 
-    <form id="courseForm" method="POST" action="{% if course %}{{ url_for('course_bp.edit_course', course_id=course.id) }}{% else %}{{ url_for('course_bp.create_course') }}{% endif %}">
-        
+    <form id="courseForm" method="POST"
+        action="{% if course %}{{ url_for('course_bp.edit_course', course_id=course.id) }}{% else %}{{ url_for('course_bp.create_course') }}{% endif %}">
+
         <div class="form-group">
             <label class="form-label" for="course_name">Course Name</label>
-            <input type="text" id="course_name" name="course_name" class="form-control" 
-                   value="{{ course.course_name if course else '' }}" required>
+            <input type="text" id="course_name" name="course_name" class="form-control"
+                value="{{ course.course_name if course else '' }}" required>
         </div>
 
         <div class="form-group">
             <label class="form-label" for="technology_stack">Technology Stack</label>
-            <input type="text" id="technology_stack" name="technology_stack" class="form-control" 
-                   value="{{ course.technology_stack if course else '' }}" required>
+            <input type="text" id="technology_stack" name="technology_stack" class="form-control"
+                value="{{ course.technology_stack if course else '' }}" required>
         </div>
 
         <div class="form-group">
             <label class="form-label" for="duration_hours">Duration (Hours)</label>
-            <input type="number" id="duration_hours" name="duration_hours" class="form-control" 
-                   value="{{ course.duration_hours if course else '' }}" min="1" required>
+            <input type="number" id="duration_hours" name="duration_hours" class="form-control"
+                value="{{ course.duration_hours if course else '' }}" min="1" required>
         </div>
 
         <div class="form-group">
             <label class="form-label" for="status">Status</label>
             <select id="status" name="status" class="form-control">
-                <option value="Active" {% if course and course.status == 'Active' %}selected{% endif %}>Active</option>
-                <option value="Inactive" {% if course and course.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                <option value="Active" {% if course and course.status=='Active' %}selected{% endif %}>Active</option>
+                <option value="Inactive" {% if course and course.status=='Inactive' %}selected{% endif %}>Inactive
+                </option>
             </select>
         </div>
 
         <div class="form-group">
             <label class="form-label" for="description">Description (Optional)</label>
-            <textarea id="description" name="description" class="form-control">{{ course.description if course else '' }}</textarea>
+            <textarea id="description" name="description"
+                class="form-control">{{ course.description if course else '' }}</textarea>
         </div>
 
         <div class="form-actions">

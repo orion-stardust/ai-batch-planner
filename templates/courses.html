@@ -85,6 +85,7 @@
         justify-content: center;
         font-family: inherit;
         box-sizing: border-box;
+        height: 38px;
     }
 
     .search-form .btn {
@@ -148,7 +149,8 @@
         text-align: left;
     }
 
-    .data-table th, .data-table td {
+    .data-table th,
+    .data-table td {
         padding: 1rem 1.5rem;
         border-bottom: 1px solid var(--border);
     }
@@ -193,7 +195,8 @@
         align-items: center;
     }
 
-    .actions-group a, .actions-group form {
+    .actions-group a,
+    .actions-group form {
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -205,7 +208,8 @@
         box-sizing: border-box !important;
     }
 
-    .actions-group a, .actions-group button {
+    .actions-group a,
+    .actions-group button {
         font-size: 0.875rem !important;
         line-height: 1 !important;
         border-radius: 6px !important;
@@ -243,18 +247,20 @@
 <!-- Toolbar -->
 <div class="toolbar">
     <form class="search-form" action="{{ url_for('course_bp.list_courses') }}" method="GET">
-        <input type="text" name="keyword" class="input-control" placeholder="Search courses..." value="{{ request.args.get('keyword', '') }}">
+        <input type="text" name="keyword" class="input-control" placeholder="Search courses..."
+            value="{{ request.args.get('keyword', '') }}">
         <select name="status" class="input-control">
             <option value="">All Status</option>
-            <option value="Active" {% if request.args.get('status') == 'Active' %}selected{% endif %}>Active</option>
-            <option value="Inactive" {% if request.args.get('status') == 'Inactive' %}selected{% endif %}>Inactive</option>
+            <option value="Active" {% if request.args.get('status')=='Active' %}selected{% endif %}>Active</option>
+            <option value="Inactive" {% if request.args.get('status')=='Inactive' %}selected{% endif %}>Inactive
+            </option>
         </select>
         <button type="submit" class="btn btn-outline">Filter</button>
         {% if request.args.get('keyword') or request.args.get('status') %}
-            <a href="{{ url_for('course_bp.list_courses') }}" class="btn btn-outline">Clear</a>
+        <a href="{{ url_for('course_bp.list_courses') }}" class="btn btn-outline">Clear</a>
         {% endif %}
     </form>
-    
+
     <a href="{{ url_for('course_bp.create_course') }}" class="btn btn-primary">+ Add New Course</a>
 </div>
 
@@ -277,15 +283,18 @@
                 <td>{{ course.technology_stack }}</td>
                 <td>{{ course.duration_hours }} hrs</td>
                 <td>
-                    <span class="status-badge {% if course.status == 'Active' %}status-active{% else %}status-inactive{% endif %}">
+                    <span
+                        class="status-badge {% if course.status == 'Active' %}status-active{% else %}status-inactive{% endif %}">
                         {{ course.status }}
                     </span>
                 </td>
                 <td>
                     <div class="actions-group">
-                        <a href="{{ url_for('course_bp.edit_course', course_id=course.id) }}" class="btn btn-secondary">Edit</a>
-                        
-                        <form action="{{ url_for('course_bp.delete_course', course_id=course.id) }}" method="POST" class="delete-form">
+                        <a href="{{ url_for('course_bp.edit_course', course_id=course.id) }}"
+                            class="btn btn-secondary">Edit</a>
+
+                        <form action="{{ url_for('course_bp.delete_course', course_id=course.id) }}" method="POST"
+                            class="delete-form">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </div>

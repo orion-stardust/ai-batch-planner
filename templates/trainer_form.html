@@ -73,6 +73,10 @@
         text-decoration: none;
         font-family: inherit;
         font-size: 1rem;
+        height: 46px;
+        line-height: 1;
+        -webkit-appearance: none;
+        appearance: none;
     }
 
     .btn-primary {
@@ -146,15 +150,17 @@
     </div>
 
     <form id="trainerForm" method="POST" action="{{ url_for('trainer.save_trainer') }}">
-        
+
         <div class="form-group">
             <label class="form-label" for="full_name">Full Name</label>
-            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="e.g. John Doe" required>
+            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="e.g. John Doe"
+                required>
         </div>
 
         <div class="form-group">
             <label class="form-label" for="email">Email Address</label>
-            <input type="email" id="email" name="email" class="form-control" placeholder="e.g. john.doe@example.com" required>
+            <input type="email" id="email" name="email" class="form-control" placeholder="e.g. john.doe@example.com"
+                required>
         </div>
 
         <div class="form-group">
@@ -173,7 +179,8 @@
                     </label>
                     {% else %}
                     <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 1rem;">
-                        No courses added yet. Please <a href="{{ url_for('course_bp.create_course') }}" style="color: var(--primary); text-decoration: underline;">add a course</a> first.
+                        No courses added yet. Please <a href="{{ url_for('course_bp.create_course') }}"
+                            style="color: var(--primary); text-decoration: underline;">add a course</a> first.
                     </div>
                     {% endfor %}
                 </div>
@@ -187,12 +194,14 @@
 
         <div class="form-group">
             <label class="form-label" for="previous_experience">Previous Experience (Years)</label>
-            <input type="number" step="0.1" id="previous_experience" name="previous_experience" class="form-control" min="0" value="0" required>
+            <input type="number" step="0.1" id="previous_experience" name="previous_experience" class="form-control"
+                min="0" value="0" required>
         </div>
 
         <div class="form-group">
             <label class="form-label" for="qualifications">Qualifications</label>
-            <input type="text" id="qualifications" name="qualifications" class="form-control" placeholder="e.g. B.Tech, M.S., AWS Certified">
+            <input type="text" id="qualifications" name="qualifications" class="form-control"
+                placeholder="e.g. B.Tech, M.S., AWS Certified">
         </div>
 
         <div class="form-actions">

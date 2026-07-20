@@ -87,6 +87,7 @@
         justify-content: center;
         font-family: inherit;
         box-sizing: border-box;
+        height: 38px;
     }
 
     .search-form .btn {
@@ -151,7 +152,8 @@
         text-align: left;
     }
 
-    .data-table th, .data-table td {
+    .data-table th,
+    .data-table td {
         padding: 1rem 1.5rem;
         border-bottom: 1px solid var(--border);
     }
@@ -207,7 +209,8 @@
         align-items: center;
     }
 
-    .actions-group a, .actions-group form {
+    .actions-group a,
+    .actions-group form {
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -219,7 +222,8 @@
         box-sizing: border-box !important;
     }
 
-    .actions-group a, .actions-group button {
+    .actions-group a,
+    .actions-group button {
         font-size: 0.825rem !important;
         line-height: 1 !important;
         border-radius: 6px !important;
@@ -249,13 +253,14 @@
 <!-- Toolbar -->
 <div class="toolbar">
     <form class="search-form" action="{{ url_for('trainer.view_trainers') }}" method="GET">
-        <input type="text" name="keyword" class="input-control" placeholder="Search trainers..." value="{{ request.args.get('keyword', '') }}">
+        <input type="text" name="keyword" class="input-control" placeholder="Search trainers..."
+            value="{{ request.args.get('keyword', '') }}">
         <button type="submit" class="btn btn-outline">Filter</button>
         {% if request.args.get('keyword') or request.args.get('status') %}
-            <a href="{{ url_for('trainer.view_trainers') }}" class="btn btn-outline">Clear</a>
+        <a href="{{ url_for('trainer.view_trainers') }}" class="btn btn-outline">Clear</a>
         {% endif %}
     </form>
-    
+
     <a href="{{ url_for('trainer.add_trainer') }}" class="btn btn-primary">+ Add New Trainer</a>
 </div>
 
@@ -283,13 +288,17 @@
                 <td>{{ trainer['skills'] }}</td>
                 <td>{{ trainer['qualifications'] or 'N/A' }}</td>
                 <td>{{ trainer['date_of_joining'] or 'N/A' }}</td>
-                <td>Total: {{ trainer['total_experience'] }} yrs (Prev: {{ trainer['previous_experience'] }} yrs, Org: {{ trainer['this_org_experience'] }} yrs)</td>
+                <td>Total: {{ trainer['total_experience'] }} yrs (Prev: {{ trainer['previous_experience'] }} yrs, Org:
+                    {{ trainer['this_org_experience'] }} yrs)</td>
                 <td>
                     <div class="actions-group">
-                        <a href="{{ url_for('trainer.view_trainer_details', trainer_id=trainer['trainer_id']) }}" class="btn btn-secondary">Details</a>
+                        <a href="{{ url_for('trainer.view_trainer_details', trainer_id=trainer['trainer_id']) }}"
+                            class="btn btn-secondary">Details</a>
                         <a href="{{ url_for('attendance.view_attendance') }}" class="btn btn-secondary">Availability</a>
-                        <a href="{{ url_for('trainer.edit_trainer_page', trainer_id=trainer['trainer_id']) }}" class="btn btn-secondary">Edit</a>
-                        <form action="{{ url_for('trainer.remove_trainer', trainer_id=trainer['trainer_id']) }}" method="POST" class="delete-form" style="display:inline;">
+                        <a href="{{ url_for('trainer.edit_trainer_page', trainer_id=trainer['trainer_id']) }}"
+                            class="btn btn-secondary">Edit</a>
+                        <form action="{{ url_for('trainer.remove_trainer', trainer_id=trainer['trainer_id']) }}"
+                            method="POST" class="delete-form" style="display:inline;">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </div>

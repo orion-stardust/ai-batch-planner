@@ -15,6 +15,23 @@ CREATE TABLE IF NOT EXISTS trainer (
     updated_by TEXT
 );
 
+CREATE TABLE IF NOT EXISTS student (
+    student_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    phone TEXT NOT NULL UNIQUE,
+    enrollment_date TEXT NOT NULL,
+    course_id INTEGER,
+    batch_id INTEGER,
+    status TEXT NOT NULL DEFAULT 'Active' CHECK(status IN ('Active', 'Inactive', 'Alumni', 'Dropped')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by TEXT,
+    updated_by TEXT,
+    FOREIGN KEY (course_id) REFERENCES Course(id) ON DELETE SET NULL,
+    FOREIGN KEY (batch_id) REFERENCES batch(batch_id) ON DELETE SET NULL
+);
+
 CREATE TABLE IF NOT EXISTS Course (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     course_name TEXT NOT NULL UNIQUE,

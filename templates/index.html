@@ -273,6 +273,10 @@
         <div class="stat-value">{{ course_stats.total_courses }}</div>
     </div>
     <div class="stat-card">
+        <div class="stat-title">Total Students</div>
+        <div class="stat-value">{{ total_students }}</div>
+    </div>
+    <div class="stat-card">
         <div class="stat-title">Total Trainers</div>
         <div class="stat-value">{{ trainer_stats.total_trainers }}</div>
     </div>
@@ -316,6 +320,15 @@
                     <span class="action-item-desc">Onboard a new instructor</span>
                 </div>
             </a>
+            <a href="{{ url_for('student_bp.create_student') }}" class="action-item">
+                <div class="action-item-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="action-item-info">
+                    <span class="action-item-title">Enroll Student</span>
+                    <span class="action-item-desc">Register a new learner</span>
+                </div>
+            </a>
             <a href="{{ url_for('attendance.view_attendance') }}" class="action-item">
                 <div class="action-item-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -337,9 +350,8 @@
         <div class="recent-list-wrapper">
             {% for b in recent_batches %}
             <div class="recent-row">
-                <div>
-                    <span class="recent-code-tag">{{ b.batch_code }}</span>
-                    <strong style="margin-left: 0.5rem; color: #fff;">{{ b.batch_name }}</strong>
+                 <div>
+                    <strong style="color: #fff;">{{ b.batch_name }}</strong>
                     <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
                         {{ b.course_name or 'Course N/A' }} &bull; Trainer: {{ b.trainer_name or 'Unassigned' }}
                     </div>

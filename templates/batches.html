@@ -284,7 +284,7 @@
 <!-- Toolbar -->
 <div class="toolbar">
     <form class="search-form" action="{{ url_for('batch_bp.list_batches') }}" method="GET">
-        <input type="text" name="search" class="input-control" placeholder="Search batch code/name..."
+        <input type="text" name="search" class="input-control" placeholder="Search batch name..."
             value="{{ search_query }}">
         
         <select name="status" class="input-control">
@@ -324,7 +324,6 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th>Batch Code</th>
                 <th>Batch Name</th>
                 <th>Course</th>
                 <th>Trainer</th>
@@ -337,12 +336,11 @@
         <tbody>
             {% for batch in batches %}
             <tr>
-                <td>
+                <td style="font-weight: 500;">
                     <a href="{{ url_for('batch_bp.view_batch_details', batch_id=batch.batch_id) }}" class="batch-code-link">
-                        {{ batch.batch_code }}
+                        {{ batch.batch_name }}
                     </a>
                 </td>
-                <td style="font-weight: 500;">{{ batch.batch_name }}</td>
                 <td>{{ batch.course_name or 'Unassigned' }}</td>
                 <td>{{ batch.trainer_name or 'Unassigned' }}</td>
                 <td style="font-size: 0.85rem;">
@@ -377,7 +375,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 3rem;">
                     No batches found. Click <strong>+ Create New Batch</strong> to get started.
                 </td>
             </tr>

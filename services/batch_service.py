@@ -143,7 +143,7 @@ class BatchService:
         mode="Offline",
         location=None,
         max_capacity=30,
-        enrolled_count=0,
+        enrolled_count=1,
         status="Upcoming",
         description=None,
         created_by=None
@@ -239,16 +239,14 @@ class BatchService:
         if enrolled_count > max_capacity:
             raise ValueError("Enrolled count cannot exceed max capacity.")
 
-        VALID_STATUSES = ('Upcoming', 'In Progress', 'Completed', 'On Hold', 'Cancelled')
-        if status not in VALID_STATUSES:
-            raise ValueError("Invalid batch status.")
-
-        # BR-03 & BR-08: In Progress status requires an assigned trainer and start_date <= today
-        if status == 'In Progress':
-            if not clean_trainer_id:
-                raise ValueError("Trainer assignment is mandatory before setting batch status to 'In Progress'.")
-            if s_date > datetime.date.today():
-                raise ValueError("Cannot set batch status to 'In Progress' before its start date.")
+        # Determine status automatically according to dates
+        today = datetime.date.today()
+        if s_date > today:
+            status = 'Upcoming'
+        elif s_date <= today <= e_date:
+            status = 'In Progress'
+        else:
+            status = 'Completed'
 
         # Check Trainer Schedule Conflict
         if clean_trainer_id:
@@ -400,12 +398,14 @@ class BatchService:
         if existing['enrolled_count'] > max_capacity:
             raise ValueError(f"Max capacity cannot be set lower than currently enrolled students ({existing['enrolled_count']}).")
 
-        # BR-03 & BR-08: In Progress status requires an assigned trainer and start_date <= today
-        if status == 'In Progress':
-            if not clean_trainer_id:
-                raise ValueError("Trainer assignment is mandatory before setting batch status to 'In Progress'.")
-            if s_date > datetime.date.today():
-                raise ValueError("Cannot set batch status to 'In Progress' before its start date.")
+        # Determine status automatically according to dates
+        today = datetime.date.today()
+        if s_date > today:
+            status = 'Upcoming'
+        elif s_date <= today <= e_date:
+            status = 'In Progress'
+        else:
+            status = 'Completed'
 
         # Check Trainer Schedule Conflict (excluding current batch)
         if clean_trainer_id:
@@ -447,39 +447,11 @@ class BatchService:
 
     def update_status(self, batch_id, status, updated_by=None):
         """
-        Updates batch status with lifecycle validation.
+        No-op since status is managed automatically based on dates.
         """
-        try:
-            batch_id = int(batch_id)
-        except (ValueError, TypeError):
-            raise ValueError("Invalid Batch ID format.")
-
-        VALID_STATUSES = ('Upcoming', 'In Progress', 'Completed', 'On Hold', 'Cancelled')
-        if status not in VALID_STATUSES:
-            raise ValueError("Invalid batch status.")
-
-        batch = self.batch_model.get_batch_by_id(batch_id)
-        if not batch:
-            raise ValueError("Batch not found.")
-
-        # BR-03 & BR-08: In Progress status validation
-        if status == 'In Progress':
-            if not batch.get('trainer_id'):
-                raise ValueError("Trainer assignment is mandatory before setting batch status to 'In Progress'.")
-            try:
-                s_date = datetime.datetime.strptime(batch['start_date'], "%Y-%m-%d").date()
-                if s_date > datetime.date.today():
-                    raise ValueError("Cannot set batch status to 'In Progress' before its start date.")
-            except ValueError:
-                pass
-
-        success = self.batch_model.update_status(batch_id, status, updated_by)
-        if not success:
-            raise ValueError("Batch status could not be updated.")
-
         return {
             "success": True,
-            "message": f"Batch status updated to '{status}' successfully."
+            "message": "Batch status is managed automatically."
         }
 
     def delete_batch(self, batch_id):

@@ -382,6 +382,20 @@
 
             <div class="dropdown">
                 <button class="dropdown-btn">
+                    Students
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('student_bp.list_students') }}">View Students</a>
+                    <a href="{{ url_for('student_bp.create_student') }}">Add Student</a>
+                </div>
+            </div>
+
+            <div class="dropdown">
+                <button class="dropdown-btn">
                     Trainers
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">

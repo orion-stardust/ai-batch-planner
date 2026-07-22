@@ -2,10 +2,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from services.batch_service import BatchService
 from services.course_service import CourseService
 from services.trainer_service import get_all_trainers
+from services.student_service import StudentService
 
 batch_bp = Blueprint("batch_bp", __name__)
 batch_service = BatchService()
 course_service = CourseService()
+student_service = StudentService()
 
 
 @batch_bp.route("/batches")
@@ -62,7 +64,7 @@ def create_batch():
         mode = request.form.get("mode", "Offline")
         location = request.form.get("location")
         max_capacity = request.form.get("max_capacity", 30)
-        enrolled_count = request.form.get("enrolled_count", 0)
+        enrolled_count = request.form.get("enrolled_count", 1)
         status = request.form.get("status", "Upcoming")
         description = request.form.get("description")
 
@@ -107,7 +109,7 @@ def create_batch():
     return render_template(
         "batch_form.html",
         action="Create",
-        batch={"batch_code": auto_code, "max_capacity": 30, "enrolled_count": 0, "status": "Upcoming", "mode": "Offline"},
+        batch={"batch_code": auto_code, "max_capacity": 30, "enrolled_count": 1, "status": "Upcoming", "mode": "Offline"},
         courses=courses,
         trainers=trainers
     )
@@ -120,7 +122,8 @@ def view_batch_details(batch_id):
     """
     try:
         batch = batch_service.get_batch_by_id(batch_id)
-        return render_template("batch_details.html", batch=batch)
+        students = student_service.get_students_by_batch(batch_id)
+        return render_template("batch_details.html", batch=batch, students=students)
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("batch_bp.list_batches"))

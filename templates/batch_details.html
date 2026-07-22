@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Batch Details - {{ batch.batch_code }} - AI Batch Planner{% endblock %}
+{% block title %}Batch Details - {{ batch.batch_name }} - AI Batch Planner{% endblock %}
 
 {% block content %}
 <style>
@@ -195,7 +195,6 @@
     <div class="details-header-card">
         <div class="batch-title-group">
             <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                <span class="batch-code-tag">{{ batch.batch_code }}</span>
                 {% set status_class = 'status-' ~ batch.status.lower().replace(' ', '-') %}
                 <span class="status-badge {{ status_class }}">{{ batch.status }}</span>
             </div>
@@ -206,15 +205,7 @@
             </div>
         </div>
 
-        <form action="{{ url_for('batch_bp.update_batch_status', batch_id=batch.batch_id) }}" method="POST" class="status-form">
-            <select name="status" class="input-control" style="height: 38px; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 0 0.8rem;" onchange="this.form.submit()">
-                <option value="Upcoming" {% if batch.status == 'Upcoming' %}selected{% endif %}>Set Status: Upcoming</option>
-                <option value="In Progress" {% if batch.status == 'In Progress' %}selected{% endif %}>Set Status: In Progress</option>
-                <option value="Completed" {% if batch.status == 'Completed' %}selected{% endif %}>Set Status: Completed</option>
-                <option value="On Hold" {% if batch.status == 'On Hold' %}selected{% endif %}>Set Status: On Hold</option>
-                <option value="Cancelled" {% if batch.status == 'Cancelled' %}selected{% endif %}>Set Status: Cancelled</option>
-            </select>
-        </form>
+
     </div>
 
     <!-- Details Grid -->
@@ -300,6 +291,46 @@
         </p>
     </div>
     {% endif %}
+
+    <div class="info-card">
+        <div class="info-card-title">Enrolled Students ({{ batch.enrolled_count }})</div>
+        {% if students %}
+        <div style="overflow-x: auto; margin-top: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: rgba(15, 23, 42, 0.4); border-bottom: 1px solid var(--border);">
+                    <tr>
+                        <th style="padding: 0.8rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Name</th>
+                        <th style="padding: 0.8rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Email</th>
+                        <th style="padding: 0.8rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Phone</th>
+                        <th style="padding: 0.8rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 0.8rem; font-size: 0.95rem; color: var(--text-main); font-weight: 500;">
+                            <a href="{{ url_for('student_bp.edit_student', student_id=student.student_id) }}" style="color: var(--primary); text-decoration: none;">
+                                {{ student.full_name }}
+                            </a>
+                        </td>
+                        <td style="padding: 0.8rem; font-size: 0.9rem; color: var(--text-muted);">{{ student.email }}</td>
+                        <td style="padding: 0.8rem; font-size: 0.9rem; color: var(--text-muted);">{{ student.phone }}</td>
+                        <td style="padding: 0.8rem;">
+                            <span class="status-badge {% if student.status == 'Active' %}status-active{% else %}status-inactive{% endif %}" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">
+                                {{ student.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="color: var(--text-muted); font-size: 0.9rem; padding: 1.5rem 0; text-align: center;">
+            No students are currently enrolled in this batch.
+        </div>
+        {% endif %}
+    </div>
 
     <!-- Action Toolbar -->
     <div class="action-toolbar">

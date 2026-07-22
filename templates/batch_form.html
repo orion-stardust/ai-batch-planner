@@ -78,7 +78,9 @@
         color: var(--danger);
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
         background-color: var(--bg-color);
         border: 1px solid var(--border);
         border-radius: 8px;
@@ -90,7 +92,9 @@
         transition: border-color 0.2s;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
         border-color: var(--primary);
     }
 
@@ -162,17 +166,13 @@
 
     <form method="POST" class="batch-form">
         <div class="form-grid">
-            <!-- Batch Code -->
-            <div class="form-group">
-                <label for="batch_code">Batch Code <span class="required-star">*</span></label>
-                <input type="text" id="batch_code" name="batch_code" value="{{ batch.batch_code or '' }}" required {% if action == 'Edit' %}readonly style="opacity: 0.7;"{% endif %}>
-                <span class="hint-text">Unique code identifier for this batch</span>
-            </div>
+
 
             <!-- Batch Name -->
             <div class="form-group">
                 <label for="batch_name">Batch Name <span class="required-star">*</span></label>
-                <input type="text" id="batch_name" name="batch_name" value="{{ batch.batch_name or '' }}" placeholder="e.g. Python Fullstack Morning Batch 1" required>
+                <input type="text" id="batch_name" name="batch_name" value="{{ batch.batch_name or '' }}"
+                    placeholder="e.g. Python Fullstack Morning Batch 1" required>
             </div>
 
             <!-- Course Selection -->
@@ -181,7 +181,7 @@
                 <select id="course_id" name="course_id" required>
                     <option value="">-- Select Course --</option>
                     {% for c in courses %}
-                    <option value="{{ c.id }}" {% if batch.course_id|string == c.id|string %}selected{% endif %}>
+                    <option value="{{ c.id }}" {% if batch.course_id|string==c.id|string %}selected{% endif %}>
                         {{ c.course_name }} ({{ c.duration_hours }} hrs)
                     </option>
                     {% endfor %}
@@ -194,7 +194,8 @@
                 <select id="trainer_id" name="trainer_id">
                     <option value="">-- Unassigned --</option>
                     {% for t in trainers %}
-                    <option value="{{ t.trainer_id }}" {% if batch.trainer_id|string == t.trainer_id|string %}selected{% endif %}>
+                    <option value="{{ t.trainer_id }}" {% if batch.trainer_id|string==t.trainer_id|string %}selected{%
+                        endif %}>
                         {{ t.full_name }} (Skills: {{ t.skills }})
                     </option>
                     {% endfor %}
@@ -205,12 +206,22 @@
             <div class="form-group">
                 <label for="slot_type">Slot Type <span class="required-star">*</span></label>
                 <select id="slot_type" name="slot_type" required>
-                    <option value="Weekday Morning (9:30 AM - 11:30 AM)" {% if batch.slot_type == 'Weekday Morning (9:30 AM - 11:30 AM)' or not batch.slot_type %}selected{% endif %}>Weekday Morning (9:30 AM - 11:30 AM)</option>
-                    <option value="Weekday Midday (11:45 AM - 1:45 PM)" {% if batch.slot_type == 'Weekday Midday (11:45 AM - 1:45 PM)' %}selected{% endif %}>Weekday Midday (11:45 AM - 1:45 PM)</option>
-                    <option value="Weekday Afternoon (2:45 PM - 4:45 PM)" {% if batch.slot_type == 'Weekday Afternoon (2:45 PM - 4:45 PM)' %}selected{% endif %}>Weekday Afternoon (2:45 PM - 4:45 PM)</option>
-                    <option value="Weekday Evening (5:00 PM - 7:00 PM)" {% if batch.slot_type == 'Weekday Evening (5:00 PM - 7:00 PM)' %}selected{% endif %}>Weekday Evening (5:00 PM - 7:00 PM)</option>
-                    <option value="Weekend Full Day (10:00 AM - 4:00 PM)" {% if batch.slot_type == 'Weekend Full Day (10:00 AM - 4:00 PM)' %}selected{% endif %}>Weekend Full Day (10:00 AM - 4:00 PM)</option>
-                    <option value="Custom" {% if batch.slot_type == 'Custom' %}selected{% endif %}>Custom</option>
+                    <option value="Weekday Morning (9:30 AM - 11:30 AM)" {% if
+                        batch.slot_type=='Weekday Morning (9:30 AM - 11:30 AM)' or not batch.slot_type %}selected{%
+                        endif %}>Weekday Morning (9:30 AM - 11:30 AM)</option>
+                    <option value="Weekday Midday (11:45 AM - 1:45 PM)" {% if
+                        batch.slot_type=='Weekday Midday (11:45 AM - 1:45 PM)' %}selected{% endif %}>Weekday Midday
+                        (11:45 AM - 1:45 PM)</option>
+                    <option value="Weekday Afternoon (2:45 PM - 4:45 PM)" {% if
+                        batch.slot_type=='Weekday Afternoon (2:45 PM - 4:45 PM)' %}selected{% endif %}>Weekday Afternoon
+                        (2:45 PM - 4:45 PM)</option>
+                    <option value="Weekday Evening (5:00 PM - 7:00 PM)" {% if
+                        batch.slot_type=='Weekday Evening (5:00 PM - 7:00 PM)' %}selected{% endif %}>Weekday Evening
+                        (5:00 PM - 7:00 PM)</option>
+                    <option value="Weekend Full Day (10:00 AM - 4:00 PM)" {% if
+                        batch.slot_type=='Weekend Full Day (10:00 AM - 4:00 PM)' %}selected{% endif %}>Weekend Full Day
+                        (10:00 AM - 4:00 PM)</option>
+                    <option value="Custom" {% if batch.slot_type=='Custom' %}selected{% endif %}>Custom</option>
                 </select>
             </div>
 
@@ -218,9 +229,10 @@
             <div class="form-group">
                 <label for="mode">Delivery Mode <span class="required-star">*</span></label>
                 <select id="mode" name="mode" required>
-                    <option value="Offline" {% if batch.mode == 'Offline' or not batch.mode %}selected{% endif %}>Offline</option>
-                    <option value="Online" {% if batch.mode == 'Online' %}selected{% endif %}>Online</option>
-                    <option value="Hybrid" {% if batch.mode == 'Hybrid' %}selected{% endif %}>Hybrid</option>
+                    <option value="Offline" {% if batch.mode=='Offline' or not batch.mode %}selected{% endif %}>Offline
+                    </option>
+                    <option value="Online" {% if batch.mode=='Online' %}selected{% endif %}>Online</option>
+                    <option value="Hybrid" {% if batch.mode=='Hybrid' %}selected{% endif %}>Hybrid</option>
                 </select>
             </div>
 
@@ -241,30 +253,24 @@
             <!-- Capacity & Enrolled -->
             <div class="form-group">
                 <label for="max_capacity">Max Capacity <span class="required-star">*</span></label>
-                <input type="number" id="max_capacity" name="max_capacity" value="{{ batch.max_capacity or 30 }}" min="1" required>
+                <input type="number" id="max_capacity" name="max_capacity" value="{{ batch.max_capacity or 30 }}"
+                    min="1" required>
             </div>
 
-            <div class="form-group">
-                <label for="status">Batch Status <span class="required-star">*</span></label>
-                <select id="status" name="status" required>
-                    <option value="Upcoming" {% if batch.status == 'Upcoming' or not batch.status %}selected{% endif %}>Upcoming</option>
-                    <option value="In Progress" {% if batch.status == 'In Progress' %}selected{% endif %}>In Progress</option>
-                    <option value="Completed" {% if batch.status == 'Completed' %}selected{% endif %}>Completed</option>
-                    <option value="On Hold" {% if batch.status == 'On Hold' %}selected{% endif %}>On Hold</option>
-                    <option value="Cancelled" {% if batch.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
-                </select>
-            </div>
+
 
             <!-- Location -->
             <div class="form-group full-width">
                 <label for="location">Location / Classroom</label>
-                <input type="text" id="location" name="location" value="{{ batch.location or '' }}" placeholder="e.g. Lab 3, 2nd Floor or Zoom Link">
+                <input type="text" id="location" name="location" value="{{ batch.location or '' }}"
+                    placeholder="e.g. Lab 3, 2nd Floor or Zoom Link">
             </div>
 
             <!-- Description -->
             <div class="form-group full-width">
                 <label for="description">Description / Notes</label>
-                <textarea id="description" name="description" rows="3" placeholder="Additional notes or batch prerequisites...">{{ batch.description or '' }}</textarea>
+                <textarea id="description" name="description" rows="3"
+                    placeholder="Additional notes or batch prerequisites...">{{ batch.description or '' }}</textarea>
             </div>
         </div>
 

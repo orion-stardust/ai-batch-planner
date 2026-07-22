@@ -15,7 +15,7 @@ class BatchModel:
 
     def create_batch(self, batch_code, batch_name, course_id, trainer_id,
                      start_date, end_date, slot_type, start_time=None, end_time=None,
-                     mode="Offline", location=None, max_capacity=30, enrolled_count=0,
+                     mode="Offline", location=None, max_capacity=30, enrolled_count=1,
                      status="Upcoming", description=None, created_by=None):
         """
         Inserts a new batch record into the database.
@@ -45,7 +45,15 @@ class BatchModel:
         """
         sql = """
             SELECT 
-                b.*,
+                b.batch_id, b.batch_code, b.batch_name, b.course_id, b.trainer_id,
+                b.start_date, b.end_date, b.slot_type, b.start_time, b.end_time,
+                b.mode, b.location, b.max_capacity, b.enrolled_count,
+                CASE 
+                    WHEN date('now', 'localtime') < b.start_date THEN 'Upcoming'
+                    WHEN date('now', 'localtime') >= b.start_date AND date('now', 'localtime') <= b.end_date THEN 'In Progress'
+                    ELSE 'Completed'
+                END AS status,
+                b.description, b.created_at, b.updated_at, b.created_by, b.updated_by,
                 c.course_name,
                 c.technology_stack,
                 c.duration_hours AS course_duration,
@@ -60,8 +68,12 @@ class BatchModel:
         params = []
 
         if status:
-            sql += " AND b.status = ?"
-            params.append(status)
+            if status == 'Upcoming':
+                sql += " AND date('now', 'localtime') < b.start_date"
+            elif status == 'In Progress':
+                sql += " AND date('now', 'localtime') >= b.start_date AND date('now', 'localtime') <= b.end_date"
+            elif status == 'Completed':
+                sql += " AND date('now', 'localtime') > b.end_date"
 
         if course_id:
             sql += " AND b.course_id = ?"
@@ -93,7 +105,15 @@ class BatchModel:
         """
         sql = """
             SELECT 
-                b.*,
+                b.batch_id, b.batch_code, b.batch_name, b.course_id, b.trainer_id,
+                b.start_date, b.end_date, b.slot_type, b.start_time, b.end_time,
+                b.mode, b.location, b.max_capacity, b.enrolled_count,
+                CASE 
+                    WHEN date('now', 'localtime') < b.start_date THEN 'Upcoming'
+                    WHEN date('now', 'localtime') >= b.start_date AND date('now', 'localtime') <= b.end_date THEN 'In Progress'
+                    ELSE 'Completed'
+                END AS status,
+                b.description, b.created_at, b.updated_at, b.created_by, b.updated_by,
                 c.course_name,
                 c.technology_stack,
                 c.duration_hours AS course_duration,
@@ -267,11 +287,11 @@ class BatchModel:
         cur = conn.cursor()
         
         total = cur.execute("SELECT COUNT(*) FROM batch").fetchone()[0] or 0
-        active = cur.execute("SELECT COUNT(*) FROM batch WHERE status = 'In Progress'").fetchone()[0] or 0
-        upcoming = cur.execute("SELECT COUNT(*) FROM batch WHERE status = 'Upcoming'").fetchone()[0] or 0
-        completed = cur.execute("SELECT COUNT(*) FROM batch WHERE status = 'Completed'").fetchone()[0] or 0
-        on_hold = cur.execute("SELECT COUNT(*) FROM batch WHERE status = 'On Hold'").fetchone()[0] or 0
-        cancelled = cur.execute("SELECT COUNT(*) FROM batch WHERE status = 'Cancelled'").fetchone()[0] or 0
+        active = cur.execute("SELECT COUNT(*) FROM batch WHERE date('now', 'localtime') >= start_date AND date('now', 'localtime') <= end_date").fetchone()[0] or 0
+        upcoming = cur.execute("SELECT COUNT(*) FROM batch WHERE date('now', 'localtime') < start_date").fetchone()[0] or 0
+        completed = cur.execute("SELECT COUNT(*) FROM batch WHERE date('now', 'localtime') > end_date").fetchone()[0] or 0
+        on_hold = 0
+        cancelled = 0
         
         enrolled_sum = cur.execute("SELECT SUM(enrolled_count) FROM batch").fetchone()[0] or 0
         capacity_sum = cur.execute("SELECT SUM(max_capacity) FROM batch").fetchone()[0] or 0

@@ -64,7 +64,7 @@ def create_batch():
         mode = request.form.get("mode", "Offline")
         location = request.form.get("location")
         max_capacity = request.form.get("max_capacity", 30)
-        enrolled_count = request.form.get("enrolled_count", 1)
+        enrolled_count = request.form.get("enrolled_count", 0)
         status = request.form.get("status", "Upcoming")
         description = request.form.get("description")
 
@@ -109,7 +109,7 @@ def create_batch():
     return render_template(
         "batch_form.html",
         action="Create",
-        batch={"batch_code": auto_code, "max_capacity": 30, "enrolled_count": 1, "status": "Upcoming", "mode": "Offline"},
+        batch={"batch_code": auto_code, "max_capacity": 30, "enrolled_count": 0, "status": "Upcoming", "mode": "Offline"},
         courses=courses,
         trainers=trainers
     )

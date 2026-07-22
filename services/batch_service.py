@@ -143,7 +143,7 @@ class BatchService:
         mode="Offline",
         location=None,
         max_capacity=30,
-        enrolled_count=1,
+        enrolled_count=0,
         status="Upcoming",
         description=None,
         created_by=None
@@ -247,6 +247,10 @@ class BatchService:
             status = 'In Progress'
         else:
             status = 'Completed'
+
+        # BR-03 & BR-08: In Progress status requires an assigned trainer
+        if status == 'In Progress' and not clean_trainer_id:
+            raise ValueError("Trainer assignment is mandatory before setting batch status to 'In Progress'.")
 
         # Check Trainer Schedule Conflict
         if clean_trainer_id:
@@ -407,6 +411,10 @@ class BatchService:
         else:
             status = 'Completed'
 
+        # BR-03 & BR-08: In Progress status requires an assigned trainer
+        if status == 'In Progress' and not clean_trainer_id:
+            raise ValueError("Trainer assignment is mandatory before setting batch status to 'In Progress'.")
+
         # Check Trainer Schedule Conflict (excluding current batch)
         if clean_trainer_id:
             conflict = self.batch_model.check_trainer_schedule_conflict(
@@ -447,11 +455,32 @@ class BatchService:
 
     def update_status(self, batch_id, status, updated_by=None):
         """
-        No-op since status is managed automatically based on dates.
+        Updates batch status with lifecycle validation.
         """
+        try:
+            batch_id = int(batch_id)
+        except (ValueError, TypeError):
+            raise ValueError("Invalid Batch ID format.")
+
+        VALID_STATUSES = ('Upcoming', 'In Progress', 'Completed', 'On Hold', 'Cancelled')
+        if status not in VALID_STATUSES:
+            raise ValueError("Invalid batch status.")
+
+        batch = self.batch_model.get_batch_by_id(batch_id)
+        if not batch:
+            raise ValueError("Batch not found.")
+
+        # BR-03 & BR-08: In Progress status validation
+        if status == 'In Progress' and not batch.get('trainer_id'):
+            raise ValueError("Trainer assignment is mandatory before setting batch status to 'In Progress'.")
+
+        success = self.batch_model.update_status(batch_id, status, updated_by)
+        if not success:
+            raise ValueError("Batch status could not be updated.")
+
         return {
             "success": True,
-            "message": "Batch status is managed automatically."
+            "message": f"Batch status updated to '{status}' successfully."
         }
 
     def delete_batch(self, batch_id):

@@ -1,0 +1,10 @@
+Purpose: Step-by-step implementation sequence and production deployment checklist.
+
+Implementation Order:
+1. Update database/schema.sql with `batch` table & indexes. Run initialize_database().
+2. Implement data model in models/batch.py (CRUD & statistics).
+3. Implement business logic and end-date calculator in services/batch_service.py.
+4. Implement Flask routes in routes/batch_routes.py.
+5. Create Jinja2 templates (batches.html, batch_form.html, batch_details.html).
+6. Create static/js/batch.js for dynamic frontend calculations.
+7. Register Blueprint in app.py and update nav link in templates/base.html.

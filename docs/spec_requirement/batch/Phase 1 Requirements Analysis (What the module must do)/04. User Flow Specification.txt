@@ -1,0 +1,24 @@
+Purpose: Defines primary user workflows for batch creation, management, and status updates.
+
+User Flow 1: Create Batch
+1. Admin navigates to `/batches/create`.
+2. Form loads active courses and trainers dynamically.
+3. Admin selects Course, Start Date, and Time Slot.
+4. Client-side JS fetches estimated end date from `/batches/api/calculate-end-date` and displays preview.
+5. Admin assigns Trainer, selects Mode and Capacity.
+6. Admin clicks "Save Batch".
+7. Backend validates inputs and saves to database.
+8. Redirects to `/batches/` with success notification.
+
+User Flow 2: Update Batch & Change Status
+1. Admin opens `/batches/`.
+2. Searches or filters to find target batch.
+3. Clicks "Edit" or "Change Status".
+4. Modifies fields or selects new status.
+5. System validates status transition (e.g. trainer assigned check).
+6. Update is committed and audit fields recorded.
+
+User Flow 3: View Batch Details & Student Roster
+1. Admin clicks batch title or "View Details".
+2. System loads `/batches/<batch_id>`.
+3. Displays course details, trainer info, schedule timeline, capacity fill bar, and enrolled student roster.

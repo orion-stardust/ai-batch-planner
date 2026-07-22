@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Batch - AI Batch Planner{% endblock %}
+
+{% block content %}
+<style>
+    .form-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .form-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .form-subtitle {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+    }
+
+    .batch-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        max-width: 100%;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    @media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .form-group.full-width {
+        grid-column: span 2;
+    }
+
+    @media (max-width: 640px) {
+        .form-group.full-width {
+            grid-column: span 1;
+        }
+    }
+
+    label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .required-star {
+        color: var(--danger);
+    }
+
+    input, select, textarea {
+        background-color: var(--bg-color);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.65rem 0.9rem;
+        color: var(--text-main);
+        font-size: 0.95rem;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: var(--primary);
+    }
+
+    .hint-text {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .badge-info {
+        background: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 0.2rem;
+    }
+
+    .form-actions-bar {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .btn-submit {
+        background: var(--primary);
+        color: white;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin: 0;
+    }
+
+    .btn-submit:hover {
+        background: var(--primary-hover);
+    }
+
+    .btn-cancel {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        margin: 0;
+    }
+
+    .btn-cancel:hover {
+        background: var(--surface-hover);
+        text-decoration: none;
+    }
+</style>
+
+<div class="form-card">
+    <div class="form-header">
+        <h1 class="form-title">{{ action }} Batch</h1>
+        <div class="form-subtitle">Fill in the batch details below to schedule training.</div>
+    </div>
+
+    <form method="POST" class="batch-form">
+        <div class="form-grid">
+            <!-- Batch Code -->
+            <div class="form-group">
+                <label for="batch_code">Batch Code <span class="required-star">*</span></label>
+                <input type="text" id="batch_code" name="batch_code" value="{{ batch.batch_code or '' }}" required {% if action == 'Edit' %}readonly style="opacity: 0.7;"{% endif %}>
+                <span class="hint-text">Unique code identifier for this batch</span>
+            </div>
+
+            <!-- Batch Name -->
+            <div class="form-group">
+                <label for="batch_name">Batch Name <span class="required-star">*</span></label>
+                <input type="text" id="batch_name" name="batch_name" value="{{ batch.batch_name or '' }}" placeholder="e.g. Python Fullstack Morning Batch 1" required>
+            </div>
+
+            <!-- Course Selection -->
+            <div class="form-group">
+                <label for="course_id">Course <span class="required-star">*</span></label>
+                <select id="course_id" name="course_id" required>
+                    <option value="">-- Select Course --</option>
+                    {% for c in courses %}
+                    <option value="{{ c.id }}" {% if batch.course_id|string == c.id|string %}selected{% endif %}>
+                        {{ c.course_name }} ({{ c.duration_hours }} hrs)
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Trainer Selection -->
+            <div class="form-group">
+                <label for="trainer_id">Assigned Trainer</label>
+                <select id="trainer_id" name="trainer_id">
+                    <option value="">-- Unassigned --</option>
+                    {% for t in trainers %}
+                    <option value="{{ t.trainer_id }}" {% if batch.trainer_id|string == t.trainer_id|string %}selected{% endif %}>
+                        {{ t.full_name }} (Skills: {{ t.skills }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Slot Type -->
+            <div class="form-group">
+                <label for="slot_type">Slot Type <span class="required-star">*</span></label>
+                <select id="slot_type" name="slot_type" required>
+                    <option value="Weekday Morning (9:30 AM - 11:30 AM)" {% if batch.slot_type == 'Weekday Morning (9:30 AM - 11:30 AM)' or not batch.slot_type %}selected{% endif %}>Weekday Morning (9:30 AM - 11:30 AM)</option>
+                    <option value="Weekday Midday (11:45 AM - 1:45 PM)" {% if batch.slot_type == 'Weekday Midday (11:45 AM - 1:45 PM)' %}selected{% endif %}>Weekday Midday (11:45 AM - 1:45 PM)</option>
+                    <option value="Weekday Afternoon (2:45 PM - 4:45 PM)" {% if batch.slot_type == 'Weekday Afternoon (2:45 PM - 4:45 PM)' %}selected{% endif %}>Weekday Afternoon (2:45 PM - 4:45 PM)</option>
+                    <option value="Weekday Evening (5:00 PM - 7:00 PM)" {% if batch.slot_type == 'Weekday Evening (5:00 PM - 7:00 PM)' %}selected{% endif %}>Weekday Evening (5:00 PM - 7:00 PM)</option>
+                    <option value="Weekend Full Day (10:00 AM - 4:00 PM)" {% if batch.slot_type == 'Weekend Full Day (10:00 AM - 4:00 PM)' %}selected{% endif %}>Weekend Full Day (10:00 AM - 4:00 PM)</option>
+                    <option value="Custom" {% if batch.slot_type == 'Custom' %}selected{% endif %}>Custom</option>
+                </select>
+            </div>
+
+            <!-- Delivery Mode -->
+            <div class="form-group">
+                <label for="mode">Delivery Mode <span class="required-star">*</span></label>
+                <select id="mode" name="mode" required>
+                    <option value="Offline" {% if batch.mode == 'Offline' or not batch.mode %}selected{% endif %}>Offline</option>
+                    <option value="Online" {% if batch.mode == 'Online' %}selected{% endif %}>Online</option>
+                    <option value="Hybrid" {% if batch.mode == 'Hybrid' %}selected{% endif %}>Hybrid</option>
+                </select>
+            </div>
+
+            <!-- Start Date -->
+            <div class="form-group">
+                <label for="start_date">Start Date <span class="required-star">*</span></label>
+                <input type="date" id="start_date" name="start_date" value="{{ batch.start_date or '' }}" required>
+            </div>
+
+            <!-- End Date -->
+            <div class="form-group">
+                <label for="end_date">End Date <span class="required-star">*</span></label>
+                <input type="date" id="end_date" name="end_date" value="{{ batch.end_date or '' }}" required>
+                <div id="calculated_end_date_badge" style="display: none;"></div>
+                <div id="calculated_project_date_badge" style="display: none;"></div>
+            </div>
+
+            <!-- Capacity & Enrolled -->
+            <div class="form-group">
+                <label for="max_capacity">Max Capacity <span class="required-star">*</span></label>
+                <input type="number" id="max_capacity" name="max_capacity" value="{{ batch.max_capacity or 30 }}" min="1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Batch Status <span class="required-star">*</span></label>
+                <select id="status" name="status" required>
+                    <option value="Upcoming" {% if batch.status == 'Upcoming' or not batch.status %}selected{% endif %}>Upcoming</option>
+                    <option value="In Progress" {% if batch.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                    <option value="Completed" {% if batch.status == 'Completed' %}selected{% endif %}>Completed</option>
+                    <option value="On Hold" {% if batch.status == 'On Hold' %}selected{% endif %}>On Hold</option>
+                    <option value="Cancelled" {% if batch.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group full-width">
+                <label for="location">Location / Classroom</label>
+                <input type="text" id="location" name="location" value="{{ batch.location or '' }}" placeholder="e.g. Lab 3, 2nd Floor or Zoom Link">
+            </div>
+
+            <!-- Description -->
+            <div class="form-group full-width">
+                <label for="description">Description / Notes</label>
+                <textarea id="description" name="description" rows="3" placeholder="Additional notes or batch prerequisites...">{{ batch.description or '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-actions-bar">
+            <a href="{{ url_for('batch_bp.list_batches') }}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-submit">{{ action }} Batch</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/batch.js') }}"></script>
+{% endblock %}

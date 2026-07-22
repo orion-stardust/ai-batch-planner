@@ -1,0 +1,13 @@
+Purpose: System architecture and design pattern specifications for backend services and models.
+
+Architecture Pattern: MVC with Service Layer separation
+- Model Layer: SQL execution only in models/batch.py.
+- Service Layer: Business logic, validation, end-date calculation engine in services/batch_service.py.
+- Route Layer: Flask HTTP request handling, session, template context, and JSON responses in routes/batch_routes.py.
+
+Validation Pipeline:
+1. Input Sanitization & Empty Field Validation
+2. Foreign Key & Entity Activity Checks (Course & Trainer)
+3. Trainer Skill Matching & Schedule Overlap Verification
+4. End Date Calculation Engine Strategy
+5. Database Insertion/Modification & Audit Log Attachment

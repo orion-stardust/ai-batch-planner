@@ -1,0 +1,7 @@
+Purpose: Security guidelines, input validation, SQL injection prevention, and auditing.
+
+Security Controls:
+- SQL Injection Prevention: All database queries must use parameterized SQL queries with `?` place-holders.
+- Input Validation: Sanitize all form inputs (HTML escaping, string stripping, regex format checks).
+- Foreign Key Integrity: SQLite `PRAGMA foreign_keys = ON;` must be executed on every connection.
+- Audit Fields: All write operations must record `created_by` and `updated_by`.

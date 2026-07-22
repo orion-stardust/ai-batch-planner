@@ -1,0 +1,24 @@
+Purpose: Defines batch management, scheduling, capacity, and allocation business rules.
+
+Business Rules:
+
+BR-01: Batch Name and Batch Code are mandatory. Batch Code must be unique.
+BR-02: Course assignment is mandatory and must reference an 'Active' Course.
+BR-03: Trainer assignment is optional during creation ('Upcoming'), but mandatory before setting status to 'In Progress'.
+BR-04: Assigned trainer must be in 'Active' status and have matching technology stack skills.
+BR-05: Schedule Overlap Prevention: A trainer cannot be assigned to two active batches operating in the same slot_type during overlapping date ranges.
+BR-06: Automatic End Date Calculation:
+       End date is computed based on course duration hours / daily slot hours, skipping Saturday/Sunday (for weekday slots) and calendar_event public holidays, plus a 5-working-day project submission period.
+BR-07: Capacity Enforcement:
+       max_capacity must be > 0 (Default: 30). enrolled_count cannot exceed max_capacity.
+BR-08: Status Lifecycle State Machine:
+       Allowed transitions:
+       Upcoming -> In Progress (Requires assigned trainer and start_date <= today)
+       In Progress -> Completed (All hours finished)
+       In Progress -> On Hold (Temporary pause)
+       On Hold -> In Progress (Resume)
+       Any State -> Cancelled (Admin override)
+BR-09: Audit Metadata:
+       All inserts and updates must populate created_by, updated_by, and refresh updated_at timestamps.
+BR-10: Deletion Restriction:
+       A batch with enrolled students (enrolled_count > 0) cannot be deleted; it must be cancelled or archived.

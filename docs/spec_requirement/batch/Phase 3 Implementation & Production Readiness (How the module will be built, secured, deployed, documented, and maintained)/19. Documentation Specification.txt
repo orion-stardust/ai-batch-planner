@@ -1,0 +1,6 @@
+Purpose: Requirements for inline code documentation, API reference, and user guides.
+
+Documentation Requirements:
+- Python Docstrings: All classes and functions in models/batch.py, services/batch_service.py, and routes/batch_routes.py must include Google/Sphinx style docstrings.
+- User Guide: Document batch creation, schedule management, and status update workflows in README.md.
+- Schema ER Diagram: Update docs/ schema diagram with batch table foreign keys.

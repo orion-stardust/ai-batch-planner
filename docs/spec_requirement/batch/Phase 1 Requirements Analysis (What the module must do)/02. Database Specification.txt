@@ -1,0 +1,37 @@
+Purpose: Defines the database schema, tables, fields, constraints, indexes, and relationships for batch management.
+
+Tables:
+
+1. Table Name: batch
+Fields:
+- batch_id: INTEGER PRIMARY KEY AUTOINCREMENT (Unique identifier)
+- batch_code: TEXT NOT NULL UNIQUE (Unique batch reference code e.g. BTH-2026-001)
+- batch_name: TEXT NOT NULL (Descriptive name of the batch)
+- course_id: INTEGER NOT NULL (References Course.id, RESTRICT ON DELETE)
+- trainer_id: INTEGER (References trainer.trainer_id, SET NULL ON DELETE)
+- start_date: TEXT NOT NULL (ISO date YYYY-MM-DD)
+- end_date: TEXT NOT NULL (ISO date YYYY-MM-DD)
+- slot_type: TEXT NOT NULL CHECK(slot_type IN ('Weekday Morning (9:30 AM - 11:30 AM)', 'Weekday Midday (11:45 AM - 1:45 PM)', 'Weekday Afternoon (2:45 PM - 4:45 PM)', 'Weekday Evening (5:00 PM - 7:00 PM)', 'Weekend Full Day (10:00 AM - 4:00 PM)', 'Custom'))
+- start_time: TEXT (HH:MM format)
+- end_time: TEXT (HH:MM format)
+- mode: TEXT NOT NULL DEFAULT 'Offline' CHECK(mode IN ('Online', 'Offline', 'Hybrid'))
+- location: TEXT (Room number or Online meeting URL)
+- max_capacity: INTEGER NOT NULL DEFAULT 30 CHECK(max_capacity > 0)
+- enrolled_count: INTEGER NOT NULL DEFAULT 0 CHECK(enrolled_count >= 0)
+- status: TEXT NOT NULL DEFAULT 'Upcoming' CHECK(status IN ('Upcoming', 'In Progress', 'Completed', 'On Hold', 'Cancelled'))
+- description: TEXT (Additional notes/remarks)
+- created_at: TIMESTAMP DEFAULT CURRENT_TIMESTAMP (Creation timestamp)
+- updated_at: TIMESTAMP DEFAULT CURRENT_TIMESTAMP (Last update timestamp)
+- created_by: TEXT (Username/system role of creator)
+- updated_by: TEXT (Username/system role of editor)
+
+Indexes:
+- idx_batch_status: ON batch(status)
+- idx_batch_course: ON batch(course_id)
+- idx_batch_trainer: ON batch(trainer_id)
+- idx_batch_dates: ON batch(start_date, end_date)
+
+Relationships:
+- Course (Parent) -> batch (Child) (1-to-many relationship, restricted delete on course_id).
+- trainer (Parent) -> batch (Child) (1-to-many relationship, set null on trainer_id).
+- batch (Parent) -> student (Child) (1-to-many relationship, student enrollment mapping).

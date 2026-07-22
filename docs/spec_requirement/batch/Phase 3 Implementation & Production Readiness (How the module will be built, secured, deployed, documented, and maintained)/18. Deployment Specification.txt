@@ -1,0 +1,7 @@
+Purpose: Deployment procedures, database migration script, and WSGI server readiness.
+
+Deployment Procedures:
+- Database Initialization: Run `python database/db.py` to create schema.
+- Environment Variables: Verify `.env` file settings.
+- Production Server: WSGI server (Gunicorn / Waitress) serving app.py.
+- Static Files: Ensure CSS/JS assets are served with proper caching headers.

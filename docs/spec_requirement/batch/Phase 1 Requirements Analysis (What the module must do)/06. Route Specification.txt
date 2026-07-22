@@ -1,0 +1,43 @@
+Purpose: Defines Flask Blueprint routes, endpoints, HTTP methods, and controller logic.
+
+Blueprint Name: batch_bp
+URL Prefix: /batches
+
+Endpoints:
+
+1. GET /batches/
+   - Description: Display batch listing page with KPI stats and search/filter controls.
+   - Template: templates/batches.html
+
+2. GET /batches/create
+   - Description: Display form to register new batch with active courses and trainers dropdowns.
+   - Template: templates/batch_form.html
+
+3. POST /batches/create
+   - Description: Process batch creation form submission.
+   - Response: Redirect to /batches/ or re-render form with errors.
+
+4. GET /batches/<int:batch_id>
+   - Description: View detailed page for a specific batch.
+   - Template: templates/batch_details.html
+
+5. GET /batches/<int:batch_id>/edit
+   - Description: Display edit form populated with current batch details.
+   - Template: templates/batch_form.html
+
+6. POST /batches/<int:batch_id>/edit
+   - Description: Process batch update submission.
+   - Response: Redirect to /batches/<batch_id> or re-render form with errors.
+
+7. POST /batches/<int:batch_id>/status
+   - Description: Update batch status (Upcoming, In Progress, Completed, On Hold, Cancelled).
+   - Response: Redirect or JSON status response.
+
+8. POST /batches/<int:batch_id>/delete
+   - Description: Delete an empty batch record.
+   - Response: Redirect to /batches/.
+
+9. GET /batches/api/calculate-end-date
+   - Description: AJAX endpoint to compute estimated end date dynamically.
+   - Input: course_id, start_date, slot_type
+   - Response: JSON {"success": true, "end_date": "YYYY-MM-DD", "project_date": "YYYY-MM-DD"}

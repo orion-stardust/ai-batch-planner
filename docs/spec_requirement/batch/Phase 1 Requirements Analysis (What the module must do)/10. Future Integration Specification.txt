@@ -1,0 +1,16 @@
+Purpose: Defines integration points for AI planning, attendance, student enrolment, and reporting.
+
+Integration Components:
+
+1. AI Batch Recommender:
+   - Provide batch data to OpenAI API for intelligent trainer allocation and optimal schedule recommendations.
+
+2. Student Enrolment System:
+   - Integrate student batch assignment and maintain real-time enrolled_count.
+
+3. Attendance & Assessment Modules:
+   - Link daily student attendance records to active batch_id.
+   - Aggregate assessment marks by batch.
+
+4. Notification System:
+   - Send email alerts when a batch is about to start or when trainer leave affects an active batch.

@@ -1,0 +1,7 @@
+Purpose: System design for cross-module interactions and database initialization integration.
+
+Module Wiring:
+- app.py registers `batch_bp` Blueprint.
+- database/db.py executes schema.sql to ensure `batch` table exists with FK constraints.
+- nav bar in templates/base.html includes active link to `/batches/`.
+- Home dashboard in app.py includes batch statistics counters.

@@ -1,0 +1,86 @@
+Purpose of the module: Management and scheduling of training institute batches, course allocations, trainer assignments, and student capacities.
+
+Register batches
+Update batches
+Delete batches
+Search batches
+Filter batches
+Track batch schedules and time slots
+Manage trainer assignment conflicts and skill alignment
+Auto-calculate batch end dates based on course duration and slot type
+
+Scope of this module:
+CRUD Operations on Batches (including Audit Fields and Delivery Modes)
+Search and Filter on Batches (by keyword, status, course, trainer, mode)
+View Batch Details (showing Course info, Trainer, Schedule, Capacity, Progress)
+Schedule Management & Dynamic End Date Calculation
+Trainer Availability & Skill Alignment Validation
+Capacity Tracking (Enrolled Students vs Max Capacity)
+
+Actors of the module:
+Primary: Administrator / Program Manager
+
+Future:
+AI Batch Recommender
+Student Enrollment System
+Attendance Tracking Module
+Report & Analytics Module
+
+
+Functional Requirements:
+Create Batch
+Description: Admin can register a new batch linked to a course and assign a trainer with audit fields.
+Input: Batch information (Batch Code, Batch Name, Course ID, Trainer ID, Start Date, Slot Type, Mode, Capacity, Status, Description, Created By)
+Output: Batch saved successfully.
+---------------------------------------
+View Batch List
+Description: Administrator can view all batches, searching by keyword and filtering by status, course, trainer, and mode.
+Input: Search keyword, Status filter, Course filter, Trainer filter, Mode filter.
+Output: Batch list displayed with schedule, trainer, course, enrollment capacity bar, and status.
+-------------------------------------
+Update Batch
+Description: Administrator can modify batch details, reassign trainers, adjust schedule, and record audit fields.
+Input: Updated batch information, Updated By.
+Output: Batch updated successfully.
+-------------------------------------------
+Delete Batch
+Description: Administrator can remove a batch (allowed only when enrolled student count is zero).
+Input: Batch ID.
+Output: Batch deleted successfully.
+-------------------------------------------
+Search & Filter Batches
+Description: Search by code/name/course/trainer and filter by status, course, trainer, and delivery mode.
+Input: Search term, filters.
+Output: Matching batches.
+-------------------------------------------
+Manage Batch Status & State Transitions
+Description: Control batch lifecycle (Upcoming -> In Progress -> Completed / On Hold / Cancelled).
+Input: Batch ID, New Status, Updated By.
+Output: Status updated successfully with transition validation.
+----------------------------------------------
+Auto-Calculate End Date
+Description: Dynamically calculate estimated batch end date based on course duration hours, daily slot duration, excluding weekends and public holidays, plus project submission buffer.
+Input: Course ID, Start Date, Slot Type.
+Output: Calculated End Date (YYYY-MM-DD) and Project Submission Date.
+
+
+Non Functional Requirements:
+Fast response
+Secure
+Easy maintenance
+Modular
+Scalable
+
+
+Dependencies:
+Depends on Database, SQLite3, Flask, Python datetime, Course Module, Trainer Module, Global Calendar Events, Templates, Static Resources
+
+
+Acceptance Criteria:
+Administrator can create batch with course mapping, trainer assignment, and metadata.
+Administrator can edit batch details and update status transitions.
+Administrator can delete empty batch.
+Search and filters return correct results.
+End date auto-calculation correctly resolves working hours, weekend exclusions, and holiday skips.
+Trainer assignment checks prevent double-booking during the same time slot.
+Capacity tracking accurately counts enrolled students and flags full batches.

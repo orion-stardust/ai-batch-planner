@@ -1,0 +1,23 @@
+Purpose: Defines unit, integration, and UI testing requirements for batch management.
+
+Test Cases:
+
+1. Model Tests:
+   - Test CRUD operations on batch table.
+   - Test unique constraint enforcement on batch_code.
+   - Test FK constraint enforcement on course_id and trainer_id.
+
+2. Service & Validation Tests:
+   - Test auto-calculation of end_date with weekend and holiday skips.
+   - Test trainer schedule overlap detection.
+   - Test status transition validations.
+   - Test capacity limit enforcement.
+
+3. Route Integration Tests:
+   - Test GET /batches/ returns HTTP 200 and renders batches.html.
+   - Test POST /batches/create saves batch and redirects.
+   - Test GET /batches/api/calculate-end-date returns correct JSON payload.
+
+4. UI/UX Tests:
+   - Verify dynamic JavaScript end-date preview triggers on form field changes.
+   - Verify responsive layout and glassmorphism styling.

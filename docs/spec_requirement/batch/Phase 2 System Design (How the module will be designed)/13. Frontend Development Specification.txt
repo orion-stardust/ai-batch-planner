@@ -1,0 +1,10 @@
+Purpose: Template architecture, design tokens, and client-side JavaScript design.
+
+Templates Structure:
+- templates/batches.html (Dashboard view, KPI cards, batch cards/grid, search & filter toolbar)
+- templates/batch_form.html (Create / Edit responsive form)
+- templates/batch_details.html (Batch details view, schedule summary, enrolled students)
+
+Static Assets:
+- static/css/style.css (Design system, glassmorphism card components, custom status badges)
+- static/js/batch.js (AJAX end-date calculation trigger, live trainer skills filter, client-side validation)

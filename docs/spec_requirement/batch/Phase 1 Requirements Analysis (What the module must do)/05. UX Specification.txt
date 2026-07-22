@@ -1,0 +1,23 @@
+Purpose: Defines user experience, design system compliance, and visual interactive standards.
+
+UX Guidelines:
+
+1. Aesthetics & Styling:
+   - Dark theme styling matching base.html.
+   - Glassmorphism cards with backdrop blur, smooth border highlights, and vibrant status colors.
+   - Clear KPI cards at the top of the page (Total, Active, Upcoming, Capacity Utilization).
+
+2. Interactive Feedback:
+   - Dynamic real-time end-date calculation preview as user picks dates/slots.
+   - Live trainer skill indicator badges matching course technology stack.
+   - Visual progress bars for student capacity fill percentage (Green <80%, Amber 80-99%, Red 100%).
+   - Status Badges:
+     - Upcoming: Indigo/Blue badge
+     - In Progress: Emerald/Green badge with pulse dot
+     - Completed: Gray/Slate badge
+     - On Hold: Amber/Yellow badge
+     - Cancelled: Rose/Red badge
+
+3. Accessibility & Layout:
+   - Fully responsive for desktop, tablet, and mobile screens.
+   - Standardized form inputs with clear validation error messages.

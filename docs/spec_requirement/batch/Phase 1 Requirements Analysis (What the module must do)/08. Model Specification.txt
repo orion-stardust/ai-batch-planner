@@ -1,0 +1,29 @@
+Purpose: Defines database queries and CRUD data access layer in models/batch.py.
+
+Class Name: BatchModel
+
+Methods:
+
+1. create_batch(data: dict) -> int
+   - SQL INSERT into batch table. Returns new batch_id.
+
+2. get_batch_by_id(batch_id: int) -> dict | None
+   - SQL SELECT with LEFT JOIN Course and LEFT JOIN trainer.
+
+3. get_batch_by_code(batch_code: str) -> dict | None
+   - SQL SELECT by unique batch_code.
+
+4. get_all_batches(filters: dict = None) -> list[dict]
+   - SQL SELECT with dynamic WHERE clauses for status, course_id, trainer_id, mode, and search keyword.
+
+5. update_batch(batch_id: int, data: dict) -> bool
+   - SQL UPDATE for batch fields and updated_at timestamp.
+
+6. delete_batch(batch_id: int) -> bool
+   - SQL DELETE from batch table (guarded by enrolled_count check).
+
+7. update_batch_status(batch_id: int, status: str, updated_by: str) -> bool
+   - SQL UPDATE batch status.
+
+8. get_batch_statistics() -> dict
+   - SQL aggregate queries for total, active, upcoming, completed count, and student capacity metrics.

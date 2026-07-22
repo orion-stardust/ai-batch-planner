@@ -1,0 +1,35 @@
+Purpose: Defines service layer methods and business logic orchestration in services/batch_service.py.
+
+Class Name: BatchService
+
+Methods:
+
+1. create_batch(form_data: dict) -> tuple[bool, str, int | None]
+   - Validates mandatory fields and batch code uniqueness.
+   - Verifies course activity and trainer availability/skills.
+   - Calculates end date if not provided.
+   - Inserts record via BatchModel.
+
+2. update_batch(batch_id: int, form_data: dict) -> tuple[bool, str]
+   - Validates existing batch and permission rules.
+   - Checks trainer availability and schedule overlap.
+   - Updates record via BatchModel.
+
+3. calculate_estimated_end_date(course_id: int, start_date_str: str, slot_type: str) -> dict
+   - Queries course duration hours.
+   - Maps daily hours based on slot_type.
+   - Iterates date calendar, skipping weekends and calendar_event holidays.
+   - Adds 5-day project submission buffer.
+
+4. change_batch_status(batch_id: int, new_status: str, user: str) -> tuple[bool, str]
+   - Validates lifecycle state machine rules.
+   - Updates status via BatchModel.
+
+5. get_batch_details(batch_id: int) -> dict | None
+   - Fetches enriched batch dictionary with course and trainer data.
+
+6. get_all_batches(filters: dict = None) -> list[dict]
+   - Fetches filtered batches list.
+
+7. get_batch_statistics() -> dict
+   - Calculates operational metrics for dashboard tiles.

@@ -1,0 +1,9 @@
+Purpose: Design of test fixtures, automated tests, and assertion strategies for batch management.
+
+Test Architecture:
+- Framework: pytest / unittest with Flask test client.
+- Fixtures: In-memory SQLite database pre-populated with active Courses, Trainers, and Calendar Events.
+- Assertions:
+  - Verify auto-calculation output for weekday vs weekend slot types.
+  - Verify batch code uniqueness violation returns error.
+  - Verify trainer overlap restriction.

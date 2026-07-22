@@ -1,0 +1,41 @@
+Purpose: Detailed database table structure, schema script, and index design for Batch Management.
+
+Schema SQL Definition:
+
+CREATE TABLE IF NOT EXISTS batch (
+    batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    batch_code TEXT NOT NULL UNIQUE,
+    batch_name TEXT NOT NULL,
+    course_id INTEGER NOT NULL,
+    trainer_id INTEGER,
+    start_date TEXT NOT NULL,
+    end_date TEXT NOT NULL,
+    slot_type TEXT NOT NULL CHECK(slot_type IN (
+        'Weekday Morning (9:30 AM - 11:30 AM)',
+        'Weekday Midday (11:45 AM - 1:45 PM)',
+        'Weekday Afternoon (2:45 PM - 4:45 PM)',
+        'Weekday Evening (5:00 PM - 7:00 PM)',
+        'Weekend Full Day (10:00 AM - 4:00 PM)',
+        'Custom'
+    )),
+    start_time TEXT,
+    end_time TEXT,
+    mode TEXT NOT NULL DEFAULT 'Offline' CHECK(mode IN ('Online', 'Offline', 'Hybrid')),
+    location TEXT,
+    max_capacity INTEGER NOT NULL DEFAULT 30 CHECK(max_capacity > 0),
+    enrolled_count INTEGER NOT NULL DEFAULT 0 CHECK(enrolled_count >= 0),
+    status TEXT NOT NULL DEFAULT 'Upcoming' CHECK(status IN ('Upcoming', 'In Progress', 'Completed', 'On Hold', 'Cancelled')),
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by TEXT,
+    updated_by TEXT,
+    FOREIGN KEY (course_id) REFERENCES Course(id) ON DELETE RESTRICT,
+    FOREIGN KEY (trainer_id) REFERENCES trainer(trainer_id) ON DELETE SET NULL
+);
+
+Indexes:
+CREATE INDEX IF NOT EXISTS idx_batch_status ON batch(status);
+CREATE INDEX IF NOT EXISTS idx_batch_course ON batch(course_id);
+CREATE INDEX IF NOT EXISTS idx_batch_trainer ON batch(trainer_id);
+CREATE INDEX IF NOT EXISTS idx_batch_dates ON batch(start_date, end_date);

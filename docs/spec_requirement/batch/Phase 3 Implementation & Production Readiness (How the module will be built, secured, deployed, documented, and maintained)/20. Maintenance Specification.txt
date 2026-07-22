@@ -1,0 +1,6 @@
+Purpose: Operations, database backup, logging, and performance monitoring.
+
+Maintenance Procedures:
+- Database Backups: Daily SQLite backup of batch_planner.db.
+- Log Monitoring: Log batch status changes and validation failures to application log file.
+- Index Optimization: Run `ANALYZE batch;` periodically to maintain SQLite query performance.

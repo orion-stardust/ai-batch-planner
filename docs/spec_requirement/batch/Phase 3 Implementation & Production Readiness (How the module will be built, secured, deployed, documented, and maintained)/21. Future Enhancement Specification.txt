@@ -1,0 +1,7 @@
+Purpose: Roadmap for future batch capabilities and integrations.
+
+Planned Enhancements:
+- Multi-trainer co-teaching support per batch.
+- Sub-batch split for lab vs theory classes.
+- Automated email/SMS reminders for batch start dates.
+- AI-driven auto-rescheduling when a trainer requests unexpected leave.

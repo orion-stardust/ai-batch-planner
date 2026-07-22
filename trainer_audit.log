@@ -27,3 +27,8 @@
 2026-07-18 13:36:31,953 - INFO - Recorded availability for trainer 3 on 2026-07-18: status=1
 2026-07-18 13:37:16,181 - INFO - Deleted availability record ID 3
 2026-07-18 13:37:23,212 - INFO - Deleted availability record ID 2
+2026-07-22 12:44:18,746 - INFO - Successfully created trainer: name='Python Expert', email='pyexpert@example.com'
+2026-07-22 12:44:46,151 - ERROR - Failed to create trainer: name='Python Expert', email='pyexpert@example.com'. DB Error: UNIQUE constraint failed: trainer.phone
+2026-07-22 12:45:06,472 - INFO - Successfully created trainer: name='Python Expert', email='pyexpert@example.com'
+2026-07-22 12:45:39,481 - INFO - Successfully created trainer: name='Python Expert', email='pyexpert@example.com'
+2026-07-22 12:48:35,500 - INFO - Successfully created trainer: name='Nataraj Adithya', email='natara@gmail.com'

@@ -15,7 +15,7 @@ class BatchModel:
 
     def create_batch(self, batch_code, batch_name, course_id, trainer_id,
                      start_date, end_date, slot_type, start_time=None, end_time=None,
-                     mode="Offline", location=None, max_capacity=30, enrolled_count=1,
+                     mode="Offline", location=None, max_capacity=30, enrolled_count=0,
                      status="Upcoming", description=None, created_by=None):
         """
         Inserts a new batch record into the database.
@@ -47,7 +47,8 @@ class BatchModel:
             SELECT 
                 b.batch_id, b.batch_code, b.batch_name, b.course_id, b.trainer_id,
                 b.start_date, b.end_date, b.slot_type, b.start_time, b.end_time,
-                b.mode, b.location, b.max_capacity, b.enrolled_count,
+                b.mode, b.location, b.max_capacity,
+                MAX(b.enrolled_count, (SELECT COUNT(*) FROM student s WHERE s.batch_id = b.batch_id)) AS enrolled_count,
                 CASE 
                     WHEN date('now', 'localtime') < b.start_date THEN 'Upcoming'
                     WHEN date('now', 'localtime') >= b.start_date AND date('now', 'localtime') <= b.end_date THEN 'In Progress'
@@ -107,7 +108,8 @@ class BatchModel:
             SELECT 
                 b.batch_id, b.batch_code, b.batch_name, b.course_id, b.trainer_id,
                 b.start_date, b.end_date, b.slot_type, b.start_time, b.end_time,
-                b.mode, b.location, b.max_capacity, b.enrolled_count,
+                b.mode, b.location, b.max_capacity,
+                MAX(b.enrolled_count, (SELECT COUNT(*) FROM student s WHERE s.batch_id = b.batch_id)) AS enrolled_count,
                 CASE 
                     WHEN date('now', 'localtime') < b.start_date THEN 'Upcoming'
                     WHEN date('now', 'localtime') >= b.start_date AND date('now', 'localtime') <= b.end_date THEN 'In Progress'

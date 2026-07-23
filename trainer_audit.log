@@ -74,3 +74,6 @@
 2026-07-23 13:26:34,579 - INFO - Successfully created trainer: name='Python Expert', email='pyexpert@example.com'
 2026-07-23 13:26:35,035 - INFO - Successfully created trainer: name='Trainer Python', email='py_trainer@test.com'
 2026-07-23 13:26:35,059 - INFO - Successfully created trainer: name='Trainer Java', email='jv_trainer@test.com'
+2026-07-23 13:52:28,497 - INFO - Successfully created trainer: name='Python Expert', email='pyexpert@example.com'
+2026-07-23 13:52:28,808 - INFO - Successfully created trainer: name='Trainer Python', email='py_trainer@test.com'
+2026-07-23 13:52:28,831 - INFO - Successfully created trainer: name='Trainer Java', email='jv_trainer@test.com'

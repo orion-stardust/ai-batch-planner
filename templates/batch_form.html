@@ -152,9 +152,59 @@
         margin: 0;
     }
 
-    .btn-cancel:hover {
-        background: var(--surface-hover);
-        text-decoration: none;
+    .student-list-container {
+        background-color: var(--bg-color);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        max-height: 250px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .student-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+        cursor: pointer;
+    }
+
+    .student-checkbox-item:hover {
+        background-color: var(--surface-hover);
+    }
+
+    .student-checkbox-item input[type="checkbox"] {
+        width: 1.1rem;
+        height: 1.1rem;
+        cursor: pointer;
+    }
+
+    .student-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .student-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-main);
+    }
+
+    .student-details {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .hint-text {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+        display: block;
     }
 </style>
 
@@ -164,7 +214,10 @@
         <div class="form-subtitle">Fill in the batch details below to schedule training.</div>
     </div>
 
-    <form method="POST" class="batch-form">
+    <form method="POST" class="batch-form" id="batchForm"
+          data-batch-id="{{ batch.batch_id or '' }}"
+          data-initial-trainer="{{ batch.trainer_id or '' }}"
+          data-initial-students="{{ batch_student_ids | tojson | safe if batch_student_ids else '[]' }}">
         <div class="form-grid">
 
 
@@ -271,6 +324,15 @@
                 <label for="description">Description / Notes</label>
                 <textarea id="description" name="description" rows="3"
                     placeholder="Additional notes or batch prerequisites...">{{ batch.description or '' }}</textarea>
+            </div>
+
+            <!-- Student Enrollment -->
+            <div class="form-group full-width" id="student_enrollment_section" style="display: none;">
+                <label>Enrolled Students</label>
+                <div class="student-list-container" id="student_list_container">
+                    <!-- Checkboxes will be populated dynamically -->
+                </div>
+                <span class="hint-text" id="student_count_hint">0 student(s) selected</span>
             </div>
         </div>
 

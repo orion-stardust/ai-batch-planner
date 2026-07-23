@@ -83,4 +83,6 @@ Administrator can delete empty batch.
 Search and filters return correct results.
 End date auto-calculation correctly resolves working hours, weekend exclusions, and holiday skips.
 Trainer assignment checks prevent double-booking during the same time slot.
+Trainer and student scheduling checks prevent double-booking or conflicting active enrollments in the same time slot.
+Administrator can enroll students to the batch directly during batch creation and edit, dynamically filtered by course.
 Capacity tracking accurately counts enrolled students and flags full batches.

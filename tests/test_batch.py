@@ -34,6 +34,7 @@ class TestBatchManagement(unittest.TestCase):
         conn.execute("DELETE FROM trainer_availablity")
         conn.execute("DELETE FROM calendar_event")
         conn.execute("DELETE FROM trainer")
+        conn.execute("DELETE FROM student")
         conn.commit()
         conn.close()
 
@@ -266,6 +267,160 @@ class TestBatchManagement(unittest.TestCase):
             if t['email'] == email:
                 return t['trainer_id']
         return None
+
+    def _create_test_student(self, name, email, phone, course_id, batch_id=None):
+        conn = sqlite3.connect(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "database", "batch_planner.db"))
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO student (full_name, email, phone, qualification, created_by, updated_by)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (name, email, phone, "B.Tech", "Tester", "Tester"))
+        student_id = cursor.lastrowid
+        
+        status = "assigned" if batch_id else "registered"
+        cursor.execute('''
+            INSERT INTO student_register (student_id, course_id, batch_id, enrollment_date, status, created_by, updated_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (student_id, course_id, batch_id, "2026-07-23", status, "Tester", "Tester"))
+        conn.commit()
+        conn.close()
+        return student_id
+
+    def test_06_student_enrollment_and_filtering(self):
+        """Test student enrollment rules, capacity checks, and API filtering routes."""
+        course_python = self._get_or_create_active_course("Test Python Course", "Python")
+        course_java = self._get_or_create_active_course("Test Java Course", "Java")
+
+        # Create active trainers with aligned skills
+        trainer_py = self._create_test_trainer("Trainer Python", "py_trainer@test.com", "9998887770", "Python")
+        trainer_jv = self._create_test_trainer("Trainer Java", "jv_trainer@test.com", "9998887771", "Java")
+
+        # Create students for both courses
+        s1 = self._create_test_student("Student Py 1", "py1@test.com", "1112223330", course_python)
+        s2 = self._create_test_student("Student Py 2", "py2@test.com", "1112223331", course_python)
+        s_java = self._create_test_student("Student Java", "jv@test.com", "1112223332", course_java)
+
+        # 1. Test batch creation with multiple valid students
+        res = self.batch_service.create_batch(
+            batch_code="BTH-PY-AUTO",
+            batch_name="Python Automation Batch",
+            course_id=course_python,
+            trainer_id=trainer_py,
+            start_date="2026-09-01",
+            end_date="2026-09-30",
+            slot_type="Weekday Morning (9:30 AM - 11:30 AM)",
+            mode="Offline",
+            max_capacity=5,
+            student_ids=[s1, s2]
+        )
+        self.assertTrue(res["success"])
+        batch_id = res["batch_id"]
+
+        # Verify enrolled_count is set to 2
+        batch = self.batch_model.get_batch_by_id(batch_id)
+        self.assertEqual(batch["enrolled_count"], 2)
+
+        # Verify student records updated with batch_id in student_register
+        conn = sqlite3.connect(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "database", "batch_planner.db"))
+        cursor = conn.cursor()
+        cursor.execute("SELECT batch_id FROM student_register WHERE student_id = ? AND course_id = ?", (s1, course_python))
+        reg1_batch_id = cursor.fetchone()[0]
+        cursor.execute("SELECT batch_id FROM student_register WHERE student_id = ? AND course_id = ?", (s2, course_python))
+        reg2_batch_id = cursor.fetchone()[0]
+        conn.close()
+
+        self.assertEqual(reg1_batch_id, batch_id)
+        self.assertEqual(reg2_batch_id, batch_id)
+
+        # 2. Test course restriction validation: enrolling java student in python batch should fail
+        with self.assertRaises(ValueError) as ctx:
+            self.batch_service.create_batch(
+                batch_code="BTH-PY-ERR",
+                batch_name="Error Python Batch",
+                course_id=course_python,
+                trainer_id=trainer_py,
+                start_date="2026-09-01",
+                end_date="2026-09-30",
+                slot_type="Weekday Morning (9:30 AM - 11:30 AM)",
+                mode="Offline",
+                max_capacity=5,
+                student_ids=[s_java]
+            )
+        self.assertIn("is not enrolled in the selected course", str(ctx.exception))
+
+        # 3. Test capacity validation: enrolling 2 students with max_capacity = 1 should fail
+        with self.assertRaises(ValueError) as ctx2:
+            self.batch_service.create_batch(
+                batch_code="BTH-PY-CAP",
+                batch_name="Cap Python Batch",
+                course_id=course_python,
+                trainer_id=trainer_py,
+                start_date="2026-09-01",
+                end_date="2026-09-30",
+                slot_type="Weekday Midday (11:45 AM - 1:45 PM)",
+                mode="Offline",
+                max_capacity=1,
+                student_ids=[s1, s2]
+            )
+        self.assertIn("exceeds the batch's max capacity", str(ctx2.exception))
+
+        # 4. Test AJAX api endpoints
+        # Fetch trainers for Python course
+        response = self.client.get(f"/api/courses/{course_python}/trainers")
+        self.assertEqual(response.status_code, 200)
+        data_trainers = response.get_json()
+        self.assertTrue(data_trainers["success"])
+        # Python trainer should be present, Java trainer should NOT be present
+        trainer_ids = [t["trainer_id"] for t in data_trainers["trainers"]]
+        self.assertIn(trainer_py, trainer_ids)
+        self.assertNotIn(trainer_jv, trainer_ids)
+
+        # Fetch students for Python course
+        response = self.client.get(f"/api/courses/{course_python}/students")
+        self.assertEqual(response.status_code, 200)
+        data_students = response.get_json()
+        self.assertTrue(data_students["success"])
+        # Python students should be present, Java student should NOT
+        student_ids = [s["student_id"] for s in data_students["students"]]
+        self.assertIn(s1, student_ids)
+        self.assertIn(s2, student_ids)
+        self.assertNotIn(s_java, student_ids)
+
+        # 5. Test schedule conflict validations on APIs and Backend
+        # Test trainer conflict API
+        response = self.client.get(f"/api/courses/{course_python}/trainers?slot_type=Weekday%20Morning%20(9:30%20AM%20-%2011:30%20AM)&start_date=2026-09-10&end_date=2026-09-20")
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        trainer_item = next(t for t in data["trainers"] if t["trainer_id"] == trainer_py)
+        self.assertTrue(trainer_item["has_conflict"])
+        self.assertEqual(trainer_item["conflict_batch_name"], "Python Automation Batch")
+
+        # Test student conflict API
+        response = self.client.get(f"/api/courses/{course_python}/students?slot_type=Weekday%20Morning%20(9:30%20AM%20-%2011:30%20AM)&start_date=2026-09-10&end_date=2026-09-20")
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["success"])
+        student_item = next(s for s in data["students"] if s["student_id"] == s1)
+        self.assertTrue(student_item["has_conflict"])
+        self.assertEqual(student_item["conflict_batch_name"], "Python Automation Batch")
+        self.assertEqual(student_item["conflict_slot"], "Weekday Morning (9:30 AM - 11:30 AM)")
+
+        # Test backend conflict validation: enrolling student with conflict should fail
+        with self.assertRaises(ValueError) as ctx3:
+            self.batch_service.create_batch(
+                batch_code="BTH-PY-CONF",
+                batch_name="Conf Batch",
+                course_id=course_python,
+                trainer_id=trainer_py, 
+                start_date="2026-09-10",
+                end_date="2026-09-20",
+                slot_type="Weekday Morning (9:30 AM - 11:30 AM)",
+                mode="Offline",
+                max_capacity=5,
+                student_ids=[s1] 
+            )
+        self.assertIn("is already enrolled in 'Python Automation Batch' during that time", str(ctx3.exception))
 
 
 if __name__ == "__main__":

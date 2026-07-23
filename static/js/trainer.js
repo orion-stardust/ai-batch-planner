@@ -42,4 +42,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 3. Skills/Course Search Filter
+    const skillsSearch = document.getElementById('skills_search');
+    if (skillsSearch) {
+        skillsSearch.addEventListener('input', function () {
+            const query = this.value.toLowerCase().trim();
+            const items = document.querySelectorAll('.skills-checkbox-item');
+            
+            items.forEach(item => {
+                const label = item.querySelector('.skills-checkbox-label');
+                if (label) {
+                    const text = label.textContent.toLowerCase();
+                    if (text.includes(query)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
+            });
+        });
+    }
+
 });

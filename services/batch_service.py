@@ -129,6 +129,51 @@ class BatchService:
             "project_date": project_date_str
         }
 
+    def get_trainers_for_course(self, course_id, slot_type=None, start_date=None, end_date=None, exclude_batch_id=None):
+        course = self.course_model.get_course_by_id(course_id)
+        if not course:
+            return []
+        from services.trainer_service import get_all_trainers
+        all_trainers = get_all_trainers()
+        active_trainers = [t for t in all_trainers if t.get('status') == 'Active']
+        
+        matched_trainers = []
+        for t in active_trainers:
+            if self._check_trainer_skill_alignment(t.get('skills'), course.get('technology_stack')):
+                trainer_data = dict(t)
+                trainer_data['has_conflict'] = False
+                trainer_data['conflict_batch_name'] = None
+                
+                if slot_type and start_date and end_date:
+                    conflict = self.batch_model.check_trainer_schedule_conflict(
+                        t['trainer_id'], slot_type, start_date, end_date, exclude_batch_id
+                    )
+                    if conflict:
+                        trainer_data['has_conflict'] = True
+                        trainer_data['conflict_batch_name'] = conflict['batch_name']
+                
+                matched_trainers.append(trainer_data)
+        return matched_trainers
+
+    def get_students_for_course(self, course_id, slot_type=None, start_date=None, end_date=None, exclude_batch_id=None):
+        students = self.batch_model.get_students_by_course(course_id)
+        
+        for s in students:
+            s['has_conflict'] = False
+            s['conflict_batch_name'] = None
+            s['conflict_slot'] = None
+            
+            if slot_type and start_date and end_date:
+                conflict = self.batch_model.check_student_schedule_conflict(
+                    s['student_id'], slot_type, start_date, end_date, exclude_batch_id
+                )
+                if conflict:
+                    s['has_conflict'] = True
+                    s['conflict_batch_name'] = conflict['batch_name']
+                    s['conflict_slot'] = conflict['slot_type']
+                    
+        return students
+
     def create_batch(
         self,
         batch_code,
@@ -146,7 +191,8 @@ class BatchService:
         enrolled_count=0,
         status="Upcoming",
         description=None,
-        created_by=None
+        created_by=None,
+        student_ids=None
     ):
         """
         Validates input and creates a new batch.
@@ -196,6 +242,12 @@ class BatchService:
                     f"Trainer skills ({trainer.get('skills')}) do not align with course technology stack ({course.get('technology_stack')})."
                 )
 
+        # Validate Course trainer assignment
+        if clean_trainer_id and trainer:
+            # Enforce that the selected trainer is assigned/aligned to the selected course
+            if not self._check_trainer_skill_alignment(trainer.get("skills"), course.get("technology_stack")):
+                raise ValueError(f"Selected trainer is not assigned to the selected course.")
+
         if not start_date or not end_date:
             raise ValueError("Start date and End date are required.")
 
@@ -229,15 +281,29 @@ class BatchService:
         except (ValueError, TypeError):
             raise ValueError("Max capacity must be a positive number.")
 
-        try:
-            enrolled_count = int(enrolled_count)
-            if enrolled_count < 0:
-                raise ValueError()
-        except (ValueError, TypeError):
-            raise ValueError("Enrolled count must be zero or a positive number.")
+        # Process and Validate selected student_ids
+        parsed_student_ids = []
+        if student_ids:
+            try:
+                parsed_student_ids = list(set(int(sid) for sid in student_ids))
+            except (ValueError, TypeError):
+                raise ValueError("Invalid student selection list.")
+            
+            for s_id in parsed_student_ids:
+                student = self.batch_model.get_student_by_id(s_id)
+                if not student:
+                    raise ValueError(f"Selected student with ID {s_id} does not exist.")
+                if not self.batch_model.check_student_course_enrollment(s_id, course_id):
+                    raise ValueError(f"Student '{student['full_name']}' is not enrolled in the selected course '{course['course_name']}'.")
+                
+                s_conflict = self.batch_model.check_student_schedule_conflict(s_id, slot_type, start_date, end_date)
+                if s_conflict:
+                    raise ValueError(f"Student '{student['full_name']}' is already enrolled in '{s_conflict['batch_name']}' during that time.")
+            
+            if len(parsed_student_ids) > max_capacity:
+                raise ValueError(f"Number of selected students ({len(parsed_student_ids)}) exceeds the batch's max capacity ({max_capacity}).")
 
-        if enrolled_count > max_capacity:
-            raise ValueError("Enrolled count cannot exceed max capacity.")
+        enrolled_count = len(parsed_student_ids)
 
         # Determine status automatically according to dates
         today = datetime.date.today()
@@ -282,6 +348,9 @@ class BatchService:
             description=description.strip() if description else None,
             created_by=created_by
         )
+
+        if parsed_student_ids:
+            self.batch_model.assign_students_to_batch(new_id, parsed_student_ids, course_id)
 
         return {
             "success": True,
@@ -333,7 +402,8 @@ class BatchService:
         max_capacity=30,
         status="Upcoming",
         description=None,
-        updated_by=None
+        updated_by=None,
+        student_ids=None
     ):
         """
         Validates and updates batch details.
@@ -380,6 +450,12 @@ class BatchService:
                     f"Trainer skills ({trainer.get('skills')}) do not align with course technology stack ({course.get('technology_stack')})."
                 )
 
+        # Validate Course trainer assignment
+        if clean_trainer_id and trainer:
+            # Enforce that the selected trainer is assigned/aligned to the selected course
+            if not self._check_trainer_skill_alignment(trainer.get("skills"), course.get("technology_stack")):
+                raise ValueError(f"Selected trainer is not assigned to the selected course.")
+
         if not start_date or not end_date:
             raise ValueError("Start date and End date are required.")
 
@@ -399,8 +475,27 @@ class BatchService:
         except (ValueError, TypeError):
             raise ValueError("Max capacity must be a positive number.")
 
-        if existing['enrolled_count'] > max_capacity:
-            raise ValueError(f"Max capacity cannot be set lower than currently enrolled students ({existing['enrolled_count']}).")
+        # Process and Validate selected student_ids
+        parsed_student_ids = []
+        if student_ids:
+            try:
+                parsed_student_ids = list(set(int(sid) for sid in student_ids))
+            except (ValueError, TypeError):
+                raise ValueError("Invalid student selection list.")
+            
+            for s_id in parsed_student_ids:
+                student = self.batch_model.get_student_by_id(s_id)
+                if not student:
+                    raise ValueError(f"Selected student with ID {s_id} does not exist.")
+                if not self.batch_model.check_student_course_enrollment(s_id, course_id):
+                    raise ValueError(f"Student '{student['full_name']}' is not enrolled in the selected course '{course['course_name']}'.")
+                
+                s_conflict = self.batch_model.check_student_schedule_conflict(s_id, slot_type, start_date, end_date, exclude_batch_id=batch_id)
+                if s_conflict:
+                    raise ValueError(f"Student '{student['full_name']}' is already enrolled in '{s_conflict['batch_name']}' during that time.")
+            
+            if len(parsed_student_ids) > max_capacity:
+                raise ValueError(f"Number of selected students ({len(parsed_student_ids)}) exceeds the batch's max capacity ({max_capacity}).")
 
         # Determine status automatically according to dates
         today = datetime.date.today()
@@ -447,6 +542,14 @@ class BatchService:
 
         if not success:
             raise ValueError("Failed to update batch details.")
+
+        # Sync Student associations
+        self.batch_model.clear_batch_association(batch_id, exclude_student_ids=parsed_student_ids)
+        if parsed_student_ids:
+            self.batch_model.assign_students_to_batch(batch_id, parsed_student_ids, course_id)
+        
+        # Update batch table enrolled_count column
+        self.batch_model.update_enrolled_count(batch_id, len(parsed_student_ids))
 
         return {
             "success": True,

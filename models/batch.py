@@ -47,7 +47,8 @@ class BatchModel:
             SELECT 
                 b.batch_id, b.batch_code, b.batch_name, b.course_id, b.trainer_id,
                 b.start_date, b.end_date, b.slot_type, b.start_time, b.end_time,
-                b.mode, b.location, b.max_capacity, b.enrolled_count,
+                b.mode, b.location, b.max_capacity,
+                MAX(b.enrolled_count, (SELECT COUNT(*) FROM student_register sr WHERE sr.batch_id = b.batch_id)) AS enrolled_count,
                 CASE 
                     WHEN date('now', 'localtime') < b.start_date THEN 'Upcoming'
                     WHEN date('now', 'localtime') >= b.start_date AND date('now', 'localtime') <= b.end_date THEN 'In Progress'
@@ -107,7 +108,8 @@ class BatchModel:
             SELECT 
                 b.batch_id, b.batch_code, b.batch_name, b.course_id, b.trainer_id,
                 b.start_date, b.end_date, b.slot_type, b.start_time, b.end_time,
-                b.mode, b.location, b.max_capacity, b.enrolled_count,
+                b.mode, b.location, b.max_capacity,
+                MAX(b.enrolled_count, (SELECT COUNT(*) FROM student_register sr WHERE sr.batch_id = b.batch_id)) AS enrolled_count,
                 CASE 
                     WHEN date('now', 'localtime') < b.start_date THEN 'Upcoming'
                     WHEN date('now', 'localtime') >= b.start_date AND date('now', 'localtime') <= b.end_date THEN 'In Progress'
@@ -279,6 +281,38 @@ class BatchModel:
         conn.close()
         return dict(row) if row else None
 
+    def check_student_schedule_conflict(self, student_id, slot_type, start_date, end_date, exclude_batch_id=None):
+        """
+        Checks if a student already has an active or upcoming batch in the same slot_type during overlapping dates.
+        Returns matching overlapping batch if conflict exists, otherwise None.
+        """
+        if not student_id:
+            return None
+
+        sql = """
+            SELECT b.batch_name, b.slot_type, b.start_date, b.end_date
+            FROM student_register sr
+            JOIN batch b ON sr.batch_id = b.batch_id
+            WHERE sr.student_id = ?
+              AND b.slot_type = ?
+              AND b.status IN ('Upcoming', 'In Progress')
+              AND (
+                  (b.start_date <= ? AND b.end_date >= ?) OR
+                  (b.start_date <= ? AND b.end_date >= ?) OR
+                  (b.start_date >= ? AND b.end_date <= ?)
+              )
+        """
+        params = [student_id, slot_type, start_date, start_date, end_date, end_date, start_date, end_date]
+
+        if exclude_batch_id:
+            sql += " AND b.batch_id <> ?"
+            params.append(exclude_batch_id)
+
+        conn = self.get_connection()
+        row = conn.execute(sql, params).fetchone()
+        conn.close()
+        return dict(row) if row else None
+
     def get_statistics(self):
         """
         Computes overall operational statistics for dashboard widgets.
@@ -310,3 +344,126 @@ class BatchModel:
             "total_capacity": capacity_sum,
             "capacity_utilization": utilization
         }
+
+    def update_enrolled_count(self, batch_id, count):
+        conn = self.get_connection()
+        try:
+            cur = conn.cursor()
+            cur.execute("""
+                UPDATE batch
+                SET enrolled_count = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE batch_id = ?
+            """, (count, batch_id))
+            conn.commit()
+            return cur.rowcount > 0
+        finally:
+            conn.close()
+
+    def get_students_by_course(self, course_id):
+        conn = self.get_connection()
+        try:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT s.student_id, s.full_name, s.email, s.phone,
+                       sr.register_id, sr.course_id, sr.batch_id, b.batch_code, b.batch_name
+                FROM student_register sr
+                JOIN student s ON sr.student_id = s.student_id
+                LEFT JOIN batch b ON sr.batch_id = b.batch_id
+                WHERE sr.course_id = ?
+                ORDER BY s.full_name ASC
+            ''', (course_id,))
+            return [dict(row) for row in cursor.fetchall()]
+        finally:
+            conn.close()
+
+    def get_student_by_id(self, student_id):
+        conn = self.get_connection()
+        try:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT student_id, full_name, email, phone, qualification
+                FROM student
+                WHERE student_id = ?
+            ''', (student_id,))
+            row = cursor.fetchone()
+            return dict(row) if row else None
+        finally:
+            conn.close()
+
+    def check_student_course_enrollment(self, student_id, course_id):
+        conn = self.get_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT 1 FROM student_register
+                WHERE student_id = ? AND course_id = ?
+            ''', (student_id, course_id))
+            return cursor.fetchone() is not None
+        finally:
+            conn.close()
+
+    def get_students_by_batch(self, batch_id):
+        conn = self.get_connection()
+        try:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT s.student_id, s.full_name, s.email, s.phone,
+                       sr.register_id, sr.course_id, sr.batch_id
+                FROM student_register sr
+                JOIN student s ON sr.student_id = s.student_id
+                WHERE sr.batch_id = ?
+                ORDER BY s.full_name ASC
+            ''', (batch_id,))
+            return [dict(row) for row in cursor.fetchall()]
+        finally:
+            conn.close()
+
+    def assign_students_to_batch(self, batch_id, student_ids, course_id):
+        if not student_ids:
+            return True
+        conn = self.get_connection()
+        try:
+            cursor = conn.cursor()
+            placeholders = ','.join('?' for _ in student_ids)
+            cursor.execute(f'''
+                UPDATE student_register
+                SET batch_id = ?,
+                    status = 'assigned',
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE student_id IN ({placeholders}) AND course_id = ?
+            ''', [batch_id] + student_ids + [course_id])
+            conn.commit()
+            return True
+        finally:
+            conn.close()
+
+    def clear_batch_association(self, batch_id, exclude_student_ids=None):
+        conn = self.get_connection()
+        try:
+            cursor = conn.cursor()
+            if exclude_student_ids:
+                placeholders = ','.join('?' for _ in exclude_student_ids)
+                cursor.execute(f'''
+                    UPDATE student_register
+                    SET batch_id = NULL,
+                        status = 'hold',
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE batch_id = ? AND student_id NOT IN ({placeholders})
+                ''', [batch_id] + exclude_student_ids)
+            else:
+                cursor.execute('''
+                    UPDATE student_register
+                    SET batch_id = NULL,
+                        status = 'hold',
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE batch_id = ?
+                ''', (batch_id,))
+            conn.commit()
+            return True
+        finally:
+            conn.close()
+

@@ -15,6 +15,7 @@ Data Table
 Add Button
 Edit Button
 Delete Button
+Course / Skills Checklist Searchbox (filters skills grid in real-time)
 
 
 User Actions:

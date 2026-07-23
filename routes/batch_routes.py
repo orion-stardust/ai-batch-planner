@@ -2,10 +2,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from services.batch_service import BatchService
 from services.course_service import CourseService
 from services.trainer_service import get_all_trainers
+from services.student_service import StudentService
 
 batch_bp = Blueprint("batch_bp", __name__)
 batch_service = BatchService()
 course_service = CourseService()
+student_service = StudentService()
 
 
 @batch_bp.route("/batches")
@@ -65,6 +67,7 @@ def create_batch():
         enrolled_count = request.form.get("enrolled_count", 0)
         status = request.form.get("status", "Upcoming")
         description = request.form.get("description")
+        student_ids = request.form.getlist("student_ids")
 
         try:
             res = batch_service.create_batch(
@@ -83,7 +86,8 @@ def create_batch():
                 enrolled_count=enrolled_count,
                 status=status,
                 description=description,
-                created_by="Admin"
+                created_by="Admin",
+                student_ids=student_ids
             )
             flash(res["message"], "success")
             return redirect(url_for("batch_bp.list_batches"))
@@ -96,7 +100,8 @@ def create_batch():
                 action="Create",
                 batch=request.form,
                 courses=courses,
-                trainers=trainers
+                trainers=trainers,
+                batch_student_ids=[int(sid) for sid in student_ids if sid.isdigit()]
             )
 
     # GET Request
@@ -109,7 +114,8 @@ def create_batch():
         action="Create",
         batch={"batch_code": auto_code, "max_capacity": 30, "enrolled_count": 0, "status": "Upcoming", "mode": "Offline"},
         courses=courses,
-        trainers=trainers
+        trainers=trainers,
+        batch_student_ids=[]
     )
 
 
@@ -120,7 +126,8 @@ def view_batch_details(batch_id):
     """
     try:
         batch = batch_service.get_batch_by_id(batch_id)
-        return render_template("batch_details.html", batch=batch)
+        students = student_service.get_students_by_batch(batch_id)
+        return render_template("batch_details.html", batch=batch, students=students)
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("batch_bp.list_batches"))
@@ -145,6 +152,7 @@ def edit_batch(batch_id):
         max_capacity = request.form.get("max_capacity", 30)
         status = request.form.get("status", "Upcoming")
         description = request.form.get("description")
+        student_ids = request.form.getlist("student_ids")
 
         try:
             res = batch_service.update_batch(
@@ -162,7 +170,8 @@ def edit_batch(batch_id):
                 max_capacity=max_capacity,
                 status=status,
                 description=description,
-                updated_by="Admin"
+                updated_by="Admin",
+                student_ids=student_ids
             )
             flash(res["message"], "success")
             return redirect(url_for("batch_bp.view_batch_details", batch_id=batch_id))
@@ -178,7 +187,8 @@ def edit_batch(batch_id):
                 action="Edit",
                 batch=form_data,
                 courses=courses,
-                trainers=trainers
+                trainers=trainers,
+                batch_student_ids=[int(sid) for sid in student_ids if sid.isdigit()]
             )
 
     # GET Request
@@ -186,12 +196,17 @@ def edit_batch(batch_id):
         batch = batch_service.get_batch_by_id(batch_id)
         courses = course_service.get_active_courses()
         trainers = [t for t in get_all_trainers() if t.get('status') == 'Active']
+        # Fetch current student IDs in this batch
+        batch_students = batch_service.batch_model.get_students_by_batch(batch_id)
+        batch_student_ids = [s["student_id"] for s in batch_students]
+
         return render_template(
             "batch_form.html",
             action="Edit",
             batch=batch,
             courses=courses,
-            trainers=trainers
+            trainers=trainers,
+            batch_student_ids=batch_student_ids
         )
     except ValueError as e:
         flash(str(e), "error")
@@ -244,4 +259,45 @@ def api_calculate_end_date():
         return jsonify({"success": True, "end_date": res})
     except ValueError as e:
         return jsonify({"success": False, "error": str(e)}), 400
+
+
+@batch_bp.route("/api/courses/<int:course_id>/trainers")
+def api_get_course_trainers(course_id):
+    try:
+        slot_type = request.args.get("slot_type")
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+        exclude_batch_id = request.args.get("exclude_batch_id")
+        if exclude_batch_id:
+            try:
+                exclude_batch_id = int(exclude_batch_id)
+            except ValueError:
+                exclude_batch_id = None
+        trainers = batch_service.get_trainers_for_course(
+            course_id, slot_type, start_date, end_date, exclude_batch_id
+        )
+        return jsonify({"success": True, "trainers": trainers})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 400
+
+
+@batch_bp.route("/api/courses/<int:course_id>/students")
+def api_get_course_students(course_id):
+    try:
+        slot_type = request.args.get("slot_type")
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+        exclude_batch_id = request.args.get("exclude_batch_id")
+        if exclude_batch_id:
+            try:
+                exclude_batch_id = int(exclude_batch_id)
+            except ValueError:
+                exclude_batch_id = None
+        students = batch_service.get_students_for_course(
+            course_id, slot_type, start_date, end_date, exclude_batch_id
+        )
+        return jsonify({"success": True, "students": students})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 400
+
 

@@ -139,17 +139,6 @@
                 value="{{ registration.enrollment_date if registration else '' }}" required>
         </div>
 
-        <div class="form-group">
-            <label class="form-label" for="batch_id">Assign to Batch (Optional)</label>
-            <select id="batch_id" name="batch_id" class="form-control">
-                <option value="">-- No Batch --</option>
-                {% for batch in batches %}
-                    <option value="{{ batch.batch_id }}" {% if registration and registration.batch_id == batch.batch_id %}selected{% endif %}>
-                        {{ batch.batch_name }} ({{ batch.batch_code }})
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
 
         <div class="form-group">
             <label class="form-label" for="status">Status</label>

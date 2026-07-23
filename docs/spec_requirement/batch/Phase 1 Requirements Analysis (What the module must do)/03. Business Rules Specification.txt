@@ -22,3 +22,7 @@ BR-09: Audit Metadata:
        All inserts and updates must populate created_by, updated_by, and refresh updated_at timestamps.
 BR-10: Deletion Restriction:
        A batch with enrolled students (enrolled_count > 0) cannot be deleted; it must be cancelled or archived.
+BR-11: Student Enrollment & Course Filter:
+       During batch creation or edit, only students registered for the selected course (represented in student_register) can be enrolled.
+BR-12: Student Schedule Overlap Prevention:
+       A student cannot be enrolled in two active batches operating in the same slot_type during overlapping date ranges. Conflicting students must be displayed as unavailable (disabled checkbox) on the frontend, showing their conflict details, and blocked on the backend.

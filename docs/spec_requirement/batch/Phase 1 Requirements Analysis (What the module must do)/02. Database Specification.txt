@@ -34,4 +34,5 @@ Indexes:
 Relationships:
 - Course (Parent) -> batch (Child) (1-to-many relationship, restricted delete on course_id).
 - trainer (Parent) -> batch (Child) (1-to-many relationship, set null on trainer_id).
-- batch (Parent) -> student (Child) (1-to-many relationship, student enrollment mapping).
+- batch (Parent) -> student_register (Child) (1-to-many relationship, mapping batch assignments).
+- student (Parent) -> student_register (Child) (1-to-many relationship, mapping student course registration).

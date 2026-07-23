@@ -28,7 +28,7 @@ Authentication Module
 
 Functional Requirements:
 Create Trainer
-Description: Admin can register trainer with audit fields (Created By) and Qualifications.
+Description: Admin can register trainer with audit fields (Created By) and Qualifications. The skills grid incorporates a client-side searchbox to filter courses easily.
 Input: Trainer information (Name, Email, Phone, Skills, Experience, Status, Qualifications, Created By)
 Output: Trainer saved successfully.
 ---------------------------------------
@@ -38,7 +38,7 @@ Input: Search keyword, Status filter.
 Output: Trainer list displayed with Qualifications and Status.
 -------------------------------------
 Update Trainer
-Description: Administrator can modify trainer details and records audit fields (Updated By).
+Description: Administrator can modify trainer details and records audit fields (Updated By). The skills grid incorporates a client-side searchbox to filter courses easily.
 Input: Updated trainer information, Updated By.
 Output: Trainer updated successfully.
 -------------------------------------------

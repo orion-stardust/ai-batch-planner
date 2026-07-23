@@ -1,90 +1,56 @@
-# Student Management Database Specification:
+# Student Management Database Specification
 
-#Module Name
-Student Management
+# Module Name
+Student Management & Registration
 
-#Purpose 
-The Student Management module stores and manages all student-related information within the AI Batch Planner system. It supports student registration, modification, status tracking, lookup, listing, and future batch enrollment mapping.
+# Purpose 
+The Student Management module stores and manages all student-related information and their registrations for courses and batches. It supports student profiles, course registrations, status tracking, and batch enrollment mapping.
 
-#Database
--Engine: SQLite3
--Database File: batch_planner.db
+# Database
+- Engine: SQLite3
+- Database File: batch_planner.db
 
-#Table: student
+# Table: student
+Stores the base profiles of the students.
 
-#Fields
-1.student_id
--Integer
--Primary Key
--Auto Increment
--Unique student identifier.
+## Fields
+1. `student_id`: INTEGER PRIMARY KEY AUTOINCREMENT
+2. `full_name`: TEXT NOT NULL
+3. `email`: TEXT NOT NULL UNIQUE
+4. `phone`: TEXT NOT NULL UNIQUE
+5. `qualification`: TEXT NOT NULL
+6. `created_at`: TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+7. `updated_at`: TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+8. `created_by`: TEXT
+9. `updated_by`: TEXT
 
-2.full_name
--Text
--Required
--Full name of the student.
+# Table: student_register
+Junction table managing student course registrations and batch allocations.
 
-3.email
--Text
--Required
--Unique
--Contact email address. Used for notifications and unique identification.
+## Fields
+1. `register_id`: INTEGER PRIMARY KEY AUTOINCREMENT
+2. `student_id`: INTEGER NOT NULL (References student.student_id, ON DELETE CASCADE)
+3. `course_id`: INTEGER NOT NULL (References Course.id, ON DELETE CASCADE)
+4. `batch_id`: INTEGER (References batch.batch_id, ON DELETE SET NULL)
+5. `enrollment_date`: TEXT NOT NULL (YYYY-MM-DD format)
+6. `status`: TEXT NOT NULL (Allowed values: 'registered', 'registed', 'assigned', 'discontinued', 'break', 'completed', 'hold')
+7. `created_at`: TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+8. `updated_at`: TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+9. `created_by`: TEXT DEFAULT 'Admin'
+10. `updated_by`: TEXT DEFAULT 'Admin'
 
-4.phone
--Text
--Required
--Unique
--Contact phone number.
+# Indexes
+- `idx_student_email`: Optimizes search and lookup by email.
+- Foreign Key indexes on `student_id`, `course_id`, and `batch_id` in `student_register`.
 
-5.enrollment_date
--Text
--Required
--The date the student was enrolled in the system.
+# Business Rules
+- Email must be unique.
+- Phone number must be unique.
+- Full name and Qualification are mandatory.
+- Student registrations are course-specific.
+- When `batch_id` is assigned to a registration, status automatically transitions to `'assigned'`. If `batch_id` is set to `NULL`, status transitions to `'hold'` (subsequent courses) or `'registered'`.
 
-6.status
--Text
--Required
--Default: Active
--Allowed values: Active, Inactive, Alumni, Dropped.
-
-7.created_at
--DateTime
--Automatically generated using CURRENT_TIMESTAMP.
-
-8.updated_at
--DateTime
--Automatically initialized using CURRENT_TIMESTAMP.
--Should be updated whenever the student is modified.
-
-9.created_by
--Text
--Optional
--Stores creator information.
-
-10.updated_by
--Text
--Optional
--Stores last modifier information.
-
-#Indexes
-#idx_student_status
-Optimizes filtering by student status.
-
-#idx_student_email
-Optimizes filtering by student email.
-
-#Business Rules
--Email must be unique.
--Phone number must be unique.
--Full name is mandatory.
--Status must be one of: Active, Inactive, Alumni, Dropped.
--Each student receives an auto-generated ID.
--Creation timestamp is automatically recorded.
--Update timestamp should be refreshed during updates.
-
-#Future Relationships
--Batch (Enrollment)
--Course (indirect)
-
-#Database Initialization
-The db.py module initializes the SQLite database by executing schema.sql, committing changes, and closing the connection.
+# Relationships
+- student (Parent) -> student_register (Child) (1-to-many relationship, cascade delete).
+- Course (Parent) -> student_register (Child) (1-to-many relationship, cascade delete).
+- batch (Parent) -> student_register (Child) (1-to-many relationship, set null on delete).

@@ -49,6 +49,7 @@ def home():
         trainer_stats=trainer_stats,
         course_stats=course_stats,
         batch_stats=batch_stats,
+        total_students=total_students,
         recent_trainers=recent_trainers,
         recent_courses=recent_courses,
         recent_batches=recent_batches

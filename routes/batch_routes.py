@@ -2,12 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from services.batch_service import BatchService
 from services.course_service import CourseService
 from services.trainer_service import get_all_trainers
-from services.student_service import StudentService
 
 batch_bp = Blueprint("batch_bp", __name__)
 batch_service = BatchService()
 course_service = CourseService()
-student_service = StudentService()
 
 
 @batch_bp.route("/batches")
@@ -122,8 +120,7 @@ def view_batch_details(batch_id):
     """
     try:
         batch = batch_service.get_batch_by_id(batch_id)
-        students = student_service.get_students_by_batch(batch_id)
-        return render_template("batch_details.html", batch=batch, students=students)
+        return render_template("batch_details.html", batch=batch)
     except ValueError as e:
         flash(str(e), "error")
         return redirect(url_for("batch_bp.list_batches"))

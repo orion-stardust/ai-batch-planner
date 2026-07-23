@@ -128,44 +128,9 @@
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="enrollment_date">Enrollment Date</label>
-            <input type="date" id="enrollment_date" name="enrollment_date" class="form-control"
-                value="{{ student.enrollment_date if student else '' }}" required>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label" for="course_id">Select Course</label>
-            <select id="course_id" name="course_id" class="form-control">
-                <option value="">-- No Course --</option>
-                {% for course in courses %}
-                    <option value="{{ course.id }}" {% if student and student.course_id == course.id %}selected{% endif %}>
-                        {{ course.course_name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label" for="batch_id">Assign to Batch</label>
-            <select id="batch_id" name="batch_id" class="form-control">
-                <option value="">-- No Batch --</option>
-                {% for batch in batches %}
-                    <option value="{{ batch.batch_id }}" {% if student and student.batch_id == batch.batch_id %}selected{% endif %}>
-                        {{ batch.batch_name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label" for="status">Status</label>
-            <select id="status" name="status" class="form-control">
-                <option value="Active" {% if student and student.status=='Active' %}selected{% endif %}>Active</option>
-                <option value="Inactive" {% if student and student.status=='Inactive' %}selected{% endif %}>Inactive
-                </option>
-                <option value="Alumni" {% if student and student.status=='Alumni' %}selected{% endif %}>Alumni</option>
-                <option value="Dropped" {% if student and student.status=='Dropped' %}selected{% endif %}>Dropped</option>
-            </select>
+            <label class="form-label" for="qualification">Qualification</label>
+            <input type="text" id="qualification" name="qualification" class="form-control"
+                value="{{ student.qualification if student else '' }}" placeholder="e.g. Bachelor of Science" required>
         </div>
 
         <div class="form-actions">

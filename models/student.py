@@ -2,14 +2,14 @@ import sqlite3
 from database.db import get_connection
 
 class StudentModel:
-    def create_student(self, full_name, email, phone, enrollment_date, status, course_id=None, batch_id=None, created_by="Admin"):
+    def create_student(self, full_name, email, phone, qualification, created_by="Admin"):
         conn = get_connection()
         try:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO student (full_name, email, phone, enrollment_date, status, course_id, batch_id, created_by, updated_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (full_name, email, phone, enrollment_date, status, course_id, batch_id, created_by, created_by))
+                INSERT INTO student (full_name, email, phone, qualification, created_by, updated_by)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (full_name, email, phone, qualification, created_by, created_by))
             conn.commit()
             return cursor.lastrowid
         except sqlite3.IntegrityError as e:
@@ -24,14 +24,10 @@ class StudentModel:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT s.student_id, s.full_name, s.email, s.phone, s.enrollment_date, s.status,
-                       s.course_id, c.course_name,
-                       s.batch_id, b.batch_code, b.batch_name,
+                SELECT s.student_id, s.full_name, s.email, s.phone, s.qualification,
                        s.created_at, s.updated_at, s.created_by, s.updated_by
                 FROM student s
-                LEFT JOIN Course c ON s.course_id = c.id
-                LEFT JOIN batch b ON s.batch_id = b.batch_id
-                ORDER BY s.enrollment_date DESC
+                ORDER BY s.student_id DESC
             ''')
             return [dict(row) for row in cursor.fetchall()]
         finally:
@@ -43,13 +39,9 @@ class StudentModel:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT s.student_id, s.full_name, s.email, s.phone, s.enrollment_date, s.status,
-                       s.course_id, c.course_name,
-                       s.batch_id, b.batch_code, b.batch_name,
+                SELECT s.student_id, s.full_name, s.email, s.phone, s.qualification,
                        s.created_at, s.updated_at, s.created_by, s.updated_by
                 FROM student s
-                LEFT JOIN Course c ON s.course_id = c.id
-                LEFT JOIN batch b ON s.batch_id = b.batch_id
                 WHERE s.student_id = ?
             ''', (student_id,))
             row = cursor.fetchone()
@@ -57,17 +49,16 @@ class StudentModel:
         finally:
             conn.close()
 
-    def update_student(self, student_id, full_name, email, phone, status, course_id=None, batch_id=None, updated_by="Admin"):
+    def update_student(self, student_id, full_name, email, phone, qualification, updated_by="Admin"):
         conn = get_connection()
         try:
             cursor = conn.cursor()
             cursor.execute('''
                 UPDATE student
-                SET full_name = ?, email = ?, phone = ?, status = ?,
-                    course_id = ?, batch_id = ?,
+                SET full_name = ?, email = ?, phone = ?, qualification = ?,
                     updated_at = CURRENT_TIMESTAMP, updated_by = ?
                 WHERE student_id = ?
-            ''', (full_name, email, phone, status, course_id, batch_id, updated_by, student_id))
+            ''', (full_name, email, phone, qualification, updated_by, student_id))
             conn.commit()
             return cursor.rowcount > 0
         finally:
@@ -118,50 +109,20 @@ class StudentModel:
             cursor = conn.cursor()
             search_pattern = f'%{keyword}%'
             cursor.execute('''
-                SELECT s.student_id, s.full_name, s.email, s.phone, s.enrollment_date, s.status,
-                       s.course_id, c.course_name, s.batch_id, b.batch_name
+                SELECT s.student_id, s.full_name, s.email, s.phone, s.qualification,
+                       s.created_at, s.updated_at, s.created_by, s.updated_by
                 FROM student s
-                LEFT JOIN Course c ON s.course_id = c.id
-                LEFT JOIN batch b ON s.batch_id = b.batch_id
-                WHERE s.full_name LIKE ? OR s.email LIKE ? OR s.phone LIKE ?
-                ORDER BY s.enrollment_date DESC
-            ''', (search_pattern, search_pattern, search_pattern))
+                WHERE s.full_name LIKE ? OR s.email LIKE ? OR s.phone LIKE ? OR s.qualification LIKE ?
+                ORDER BY s.student_id DESC
+            ''', (search_pattern, search_pattern, search_pattern, search_pattern))
             return [dict(row) for row in cursor.fetchall()]
         finally:
             conn.close()
 
     def filter_students(self, status):
-        conn = get_db_connection()
-        try:
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
-            cursor.execute('''
-                SELECT s.student_id, s.full_name, s.email, s.phone, s.enrollment_date, s.status,
-                       s.course_id, c.course_name, s.batch_id, b.batch_name
-                FROM student s
-                LEFT JOIN Course c ON s.course_id = c.id
-                LEFT JOIN batch b ON s.batch_id = b.batch_id
-                WHERE s.status = ?
-                ORDER BY s.enrollment_date DESC
-            ''', (status,))
-            return [dict(row) for row in cursor.fetchall()]
-        finally:
-            conn.close()
+        # status is removed, return empty
+        return []
 
     def get_students_by_batch(self, batch_id):
-        conn = get_connection()
-        try:
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
-            cursor.execute('''
-                SELECT s.student_id, s.full_name, s.email, s.phone, s.enrollment_date, s.status,
-                       s.course_id, c.course_name, s.batch_id, b.batch_name
-                FROM student s
-                LEFT JOIN Course c ON s.course_id = c.id
-                LEFT JOIN batch b ON s.batch_id = b.batch_id
-                WHERE s.batch_id = ?
-                ORDER BY s.enrollment_date DESC
-            ''', (batch_id,))
-            return [dict(row) for row in cursor.fetchall()]
-        finally:
-            conn.close()
+        # batch relation is removed, return empty
+        return []

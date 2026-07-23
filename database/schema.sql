@@ -20,16 +20,11 @@ CREATE TABLE IF NOT EXISTS student (
     full_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     phone TEXT NOT NULL UNIQUE,
-    enrollment_date TEXT NOT NULL,
-    course_id INTEGER,
-    batch_id INTEGER,
-    status TEXT NOT NULL DEFAULT 'Active' CHECK(status IN ('Active', 'Inactive', 'Alumni', 'Dropped')),
+    qualification TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_by TEXT,
-    updated_by TEXT,
-    FOREIGN KEY (course_id) REFERENCES Course(id) ON DELETE SET NULL,
-    FOREIGN KEY (batch_id) REFERENCES batch(batch_id) ON DELETE SET NULL
+    updated_by TEXT
 );
 
 CREATE TABLE IF NOT EXISTS Course (
@@ -114,3 +109,19 @@ CREATE INDEX IF NOT EXISTS idx_batch_status ON batch(status);
 CREATE INDEX IF NOT EXISTS idx_batch_course ON batch(course_id);
 CREATE INDEX IF NOT EXISTS idx_batch_trainer ON batch(trainer_id);
 CREATE INDEX IF NOT EXISTS idx_batch_dates ON batch(start_date, end_date);
+
+CREATE TABLE IF NOT EXISTS student_register (
+    register_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER NOT NULL,
+    course_id INTEGER NOT NULL,
+    batch_id INTEGER,
+    enrollment_date TEXT NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('registered', 'registed', 'assigned', 'discontinued', 'break', 'completed', 'hold')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by TEXT DEFAULT 'Admin',
+    updated_by TEXT DEFAULT 'Admin',
+    FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES Course(id) ON DELETE CASCADE,
+    FOREIGN KEY (batch_id) REFERENCES batch(batch_id) ON DELETE SET NULL
+);

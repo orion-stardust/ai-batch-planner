@@ -6,13 +6,15 @@ class StudentService:
     def __init__(self):
         self.model = StudentModel()
 
-    def _validate_student_data(self, full_name, email, phone, status, student_id=None):
+    def _validate_student_data(self, full_name, email, phone, qualification, student_id=None):
         if not full_name or not full_name.strip():
             raise ValueError("Full name cannot be empty.")
         if not email or not email.strip():
             raise ValueError("Email cannot be empty.")
         if not phone or not phone.strip():
             raise ValueError("Phone cannot be empty.")
+        if not qualification or not qualification.strip():
+            raise ValueError("Qualification cannot be empty.")
             
         # Validate Email Format
         email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
@@ -24,40 +26,23 @@ class StudentService:
         if len(phone_digits) < 7 or len(phone_digits) > 15:
             raise ValueError("Phone must contain between 7 and 15 digits.")
 
-        # Validate Status
-        valid_statuses = ["Active", "Inactive", "Alumni", "Dropped"]
-        if status not in valid_statuses:
-            raise ValueError(f"Status must be one of: {', '.join(valid_statuses)}.")
-
         # Check for duplicates using the Model
         if self.model.student_exists(email=email.strip(), exclude_id=student_id):
             raise ValueError(f"A student with email '{email}' already exists.")
         if self.model.student_exists(phone=phone.strip(), exclude_id=student_id):
             raise ValueError(f"A student with phone '{phone}' already exists.")
 
-    def create_student(self, full_name, email, phone, enrollment_date, status="Active", course_id=None, batch_id=None, created_by="Admin"):
-        self._validate_student_data(full_name, email, phone, status)
+    def create_student(self, full_name, email, phone, qualification, created_by="Admin"):
+        self._validate_student_data(full_name, email, phone, qualification)
         
-        if not enrollment_date:
-            raise ValueError("Enrollment date is required.")
-
-        course_id = int(course_id) if course_id else None
-        batch_id = int(batch_id) if batch_id else None
-
         new_id = self.model.create_student(
             full_name=full_name.strip(),
             email=email.strip(),
             phone=phone.strip(),
-            enrollment_date=enrollment_date,
-            status=status,
-            course_id=course_id,
-            batch_id=batch_id,
+            qualification=qualification.strip(),
             created_by=created_by
         )
         
-        if batch_id:
-            BatchModel().increment_enrolled_count(batch_id)
-            
         return {"success": True, "message": "Student created successfully.", "student_id": new_id}
 
     def get_all_students(self):
@@ -74,40 +59,28 @@ class StudentService:
             raise ValueError("Student not found.")
         return student
 
-    def update_student(self, student_id, full_name, email, phone, status, course_id=None, batch_id=None, updated_by="Admin"):
+    def update_student(self, student_id, full_name, email, phone, qualification, updated_by="Admin"):
         try:
             student_id = int(student_id)
         except (ValueError, TypeError):
             raise ValueError("Invalid student ID.")
 
         # Verify student exists before attempting to update
-        existing_student = self.get_student_by_id(student_id)
-        old_batch_id = existing_student.get('batch_id')
+        self.get_student_by_id(student_id)
         
-        # Validate input (passing student_id to exclude it from duplicate checks)
-        self._validate_student_data(full_name, email, phone, status, student_id=student_id)
-
-        course_id = int(course_id) if course_id else None
-        batch_id = int(batch_id) if batch_id else None
+        # Validate input
+        self._validate_student_data(full_name, email, phone, qualification, student_id=student_id)
 
         success = self.model.update_student(
             student_id=student_id,
             full_name=full_name.strip(),
             email=email.strip(),
             phone=phone.strip(),
-            status=status,
-            course_id=course_id,
-            batch_id=batch_id,
+            qualification=qualification.strip(),
             updated_by=updated_by
         )
         if not success:
              raise ValueError("Failed to update student. Database error.")
-
-        if old_batch_id != batch_id:
-            if old_batch_id:
-                BatchModel().decrement_enrolled_count(old_batch_id)
-            if batch_id:
-                BatchModel().increment_enrolled_count(batch_id)
 
         return {"success": True, "message": "Student updated successfully."}
 
@@ -118,15 +91,11 @@ class StudentService:
             raise ValueError("Invalid student ID.")
             
         # Verify student exists before deletion
-        existing_student = self.get_student_by_id(student_id)
-        old_batch_id = existing_student.get('batch_id')
+        self.get_student_by_id(student_id)
         
         success = self.model.delete_student(student_id)
         if not success:
             raise ValueError("Failed to delete student.")
-            
-        if old_batch_id:
-            BatchModel().decrement_enrolled_count(old_batch_id)
             
         return {"success": True, "message": "Student deleted successfully."}
 

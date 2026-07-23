@@ -47,8 +47,7 @@ class BatchModel:
             SELECT 
                 b.batch_id, b.batch_code, b.batch_name, b.course_id, b.trainer_id,
                 b.start_date, b.end_date, b.slot_type, b.start_time, b.end_time,
-                b.mode, b.location, b.max_capacity,
-                MAX(b.enrolled_count, (SELECT COUNT(*) FROM student s WHERE s.batch_id = b.batch_id)) AS enrolled_count,
+                b.mode, b.location, b.max_capacity, b.enrolled_count,
                 CASE 
                     WHEN date('now', 'localtime') < b.start_date THEN 'Upcoming'
                     WHEN date('now', 'localtime') >= b.start_date AND date('now', 'localtime') <= b.end_date THEN 'In Progress'
@@ -108,8 +107,7 @@ class BatchModel:
             SELECT 
                 b.batch_id, b.batch_code, b.batch_name, b.course_id, b.trainer_id,
                 b.start_date, b.end_date, b.slot_type, b.start_time, b.end_time,
-                b.mode, b.location, b.max_capacity,
-                MAX(b.enrolled_count, (SELECT COUNT(*) FROM student s WHERE s.batch_id = b.batch_id)) AS enrolled_count,
+                b.mode, b.location, b.max_capacity, b.enrolled_count,
                 CASE 
                     WHEN date('now', 'localtime') < b.start_date THEN 'Upcoming'
                     WHEN date('now', 'localtime') >= b.start_date AND date('now', 'localtime') <= b.end_date THEN 'In Progress'
